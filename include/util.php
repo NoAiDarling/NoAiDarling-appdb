@@ -156,7 +156,7 @@ function get_bugzilla_versions($bReturnIds = false)
     foreach($aBranches as $sBranch)
     {
         $sWhere = "WHERE product_id =".BUGZILLA_PRODUCT_ID." AND value LIKE '$sBranch%'";
-        $sQuery = "SELECT $sFetchColumn FROM $sTable $sWhere ORDER BY id desc limit 8";
+        $sQuery = "SELECT $sFetchColumn FROM $sTable $sWhere ORDER BY id desc limit 10";
         $hResult = query_bugzilladb($sQuery);
         if($hResult)
         {
