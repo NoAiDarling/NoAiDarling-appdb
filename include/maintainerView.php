@@ -112,22 +112,22 @@ class maintainerView
             $oCell = new TableCell('');
             $oCell->SetStyle($sStyle.' border-left: thin solid;');
             $oTableRow->AddCell($oCell);
-                        
+
             $oCell = new TableCell('');
             $oCell->SetStyle($sStyle.' border-left: thin solid;');
             $oTableRow->AddCell($oCell);
-                          
+
             $oCell = new TableCell('');
             $oCell->SetStyle($sStyle.' border-left: thin solid;');
             $oTableRow->AddCell($oCell);
-            
-            $iMaintainedApps = maintainer::GetMaintainerCountForUserId($iUserId, true);    
+
+            $iMaintainedApps = maintainer::GetMaintainerCountForUserId($iUserId, true);
             $sPlural = ($iMaintainedApps == 1) ? '' : 's';
             $oCell = new TableCell($iMaintainedApps ? "$iMaintainedApps application$sPlural" : '&nbsp;');
             $oCell->SetStyle($sStyle);
             $oTableRow->AddCell($oCell);
 
-            $iMaintainedVersions = maintainer::GetMaintainerCountForUserId($iUserId, false);    
+            $iMaintainedVersions = maintainer::GetMaintainerCountForUserId($iUserId, false);
             $sPlural = ($iMaintainedVersions == 1) ? '' : 's';
             $oCell = new TableCell($iMaintainedVersions ? "$iMaintainedVersions version$sPlural" : '&nbsp;');
             $oCell->SetStyle($sStyle);
@@ -139,7 +139,7 @@ class maintainerView
 
             $oTableRow->SetClass('color4');
             $oTable->AddRow($oTableRow);
-            
+
             /* Show all apps/versions that the user maintains */
             $hAppResult = query_parameters("SELECT * FROM appMaintainers WHERE userId = '?'", $oMaintainerView->iUserId);
             for($i = 0; $oAppRow = query_fetch_object($hAppResult); $i++)
@@ -147,7 +147,7 @@ class maintainerView
                 $oMaintainer = new maintainer(null, $oAppRow);
                 $oTableRow = new TableRow();
 
-                $oTableRow->SetClass($i % 2 ? 'color0' : 'color1');     
+                $oTableRow->SetClass($i % 2 ? 'color0' : 'color1');
 
                 if($oMaintainer->bSuperMaintainer)
                 {
@@ -174,7 +174,7 @@ class maintainerView
             }
         }
 
-        echo $oTable->GetString();    
+        echo $oTable->GetString();
      }
 
     function objectGetItemsPerPage($sState = 'accepted')
@@ -193,7 +193,7 @@ class maintainerView
 
        // get available maintainers
         $sQuery = "SELECT * FROM appMaintainers, user_list WHERE appMaintainers.userId = user_list.userid";
-        $sQuery.= " AND state='accepted' GROUP BY appMaintainers.userid ORDER BY realname, email $sLimit"; 
+        $sQuery.= " AND state='accepted' GROUP BY appMaintainers.userid ORDER BY realname, email $sLimit";
         $hResult = query_parameters($sQuery);
 
         return $hResult;
@@ -287,7 +287,7 @@ class maintainerView
         $oTable->AddRow($oTableRow);
 
         $i = 1;
-        while(list($iIndex, list($iAppId, $iVersionId, $bSuperMaintainer)) = each($aMaintainedApps))
+        foreach ($aMaintainedApps as $iIndex => list($iAppId, $iVersionId, $bSuperMaintainer))
         {
             $oApp = new application($iAppId);
             $aVersions = array();

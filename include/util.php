@@ -28,23 +28,23 @@ function util_show_error_page_and_exit($text = null, $message = null)
  */
 function util_redirect_and_exit($url)
 {
-    header("Location: ".html_entity_decode($url)); 
+    header("Location: ".html_entity_decode($url));
     exit;
 }
 
 function build_urlarg($vars)
 {
     $arr = array();
-    while(list($key, $val) = each($vars))
+    foreach ($vars as $key => $val)
     {
         if(is_array($val))
         {
-            while(list($idx, $value) = each($val))
+            foreach ($val as $idx => $value)
             {
-                //echo "Encoding $key / $value<br>";
                 $arr[] = rawurlencode($key."[]")."=".rawurlencode($value);
             }
-        } else
+        }
+        else
         {
             $arr[] = $key."=".rawurlencode($val);
         }
@@ -58,8 +58,10 @@ function build_urlarg($vars)
 function values($arr)
 {
     $res = array();
-    while(list($k, $v) = each($arr))
+    foreach ($arr as $k => $v)
+    {
         $res[] = $v;
+    }
     return $res;
 }
 
@@ -310,7 +312,7 @@ function cleanupSearchWords($search_words)
         /* remove all single letters */
         if((strlen($value) == 1) && !is_numeric($value))
             $found = true;
-        
+
         /* if we didn't find this word, keep it */
         if($found == false)
         {
@@ -618,7 +620,7 @@ function trimmed_link($shUrl, $iLength)
 /**
  * Remove html formatting from description and extract the first part of the description only.
  * This is to be used for search results, application summary tables, etc.
- */ 
+ */
 function util_trim_description($sDescription)
 {
     // 1) maybe it's an html description and lines are separated with tags

@@ -91,7 +91,7 @@ class queuedEntries
     {
       if($bDebugOutputEnabled)
         echo "Processing iVersionId of ".$iVersionId."\n";
-        
+
       //////////////////
       // queued testdata
 
@@ -170,7 +170,7 @@ class maintainer
     {
         // set a default notification level of 0
         $this->iNotificationLevel = 0;
-      
+
         if(!$iMaintainerId && !$oRow)
             return;
 
@@ -248,7 +248,7 @@ class maintainer
         /* the version, then continue processing the request */
 
         $oUser = new User($this->iUserId);
-        
+
         if(!$oUser->isSuperMaintainer($this->iAppId) &&
            ((!$this->bSuperMaintainer && !$oUser->isMaintainer($this->iVersionId)) || $this->bSuperMaintainer))
         {
@@ -403,7 +403,7 @@ class maintainer
 
         if($hResult)
             return true;
-        
+
         return false;
     }
 
@@ -545,17 +545,17 @@ class maintainer
     {
         return self::getMaintainerCountForUserId($oUser->iUserId, $bSuperMaintainer);
     }
-    
-    // gets maintainers who have not logged in in the specified number of months 
+
+    // gets maintainers who have not logged in in the specified number of months
     public static function getInactiveMaintainers($iMonths)
     {
-       $sQuery = "SELECT * FROM appMaintainers, user_list WHERE appMaintainers.userId = user_list.userid 
-           AND stamp <= DATE_SUB(CURDATE(), INTERVAL $iMonths MONTH)";       
+       $sQuery = "SELECT * FROM appMaintainers, user_list WHERE appMaintainers.userId = user_list.userid
+           AND stamp <= DATE_SUB(CURDATE(), INTERVAL $iMonths MONTH)";
         return query_parameters($sQuery);
     }
 
     /**
-     * get the applications and versions that this user maintains 
+     * get the applications and versions that this user maintains
      */
     public static function getAppsMaintained($oUser)
     {
@@ -584,7 +584,7 @@ class maintainer
         if($sState == 'rejected')
             return FALSE;
 
-        /* Excluding requests for queued apps and versions, as these are handled 
+        /* Excluding requests for queued apps and versions, as these are handled
            automatically.  One SELECT for super maintainers, one for maintainers. */
        $sQuery = "SELECT COUNT(maintainerId) as count FROM appMaintainers WHERE
             appMaintainers.state = '?'";
@@ -626,7 +626,7 @@ class maintainer
         }
         if(!$hResult)
             return false;
-        
+
         return query_num_rows($hResult);
     }
 
@@ -693,13 +693,13 @@ class maintainer
                             AND superMaintainer = '1'
                         )
                     )", $iVersionId);
-        } 
+        }
         /*
          * If versionId was not supplied we fetch supermaintainers of application and maintainer of all versions.
          */
         elseif($iAppId)
         {
-            $hResult = query_parameters("SELECT userId 
+            $hResult = query_parameters("SELECT userId
                                  FROM appMaintainers
                                  WHERE appId = '?' AND state = 'accepted'",
                                         $iAppId);
@@ -786,7 +786,7 @@ class maintainer
         echo "<div align=center><table width='90%' border=0 cellpadding=3 cellspacing=0><tr><td>\n\n";
         echo "Please enter an accurate and personalized reply anytime a maintainer request is rejected.\n";
         echo "Its not polite to reject someones attempt at trying to help out without explaining why.\n";
-        echo "</td></tr></table></div>\n\n";    
+        echo "</td></tr></table></div>\n\n";
     }
 
     function objectGetState()
@@ -889,7 +889,7 @@ class maintainer
             /* display maintainers for the version */
             if($aOtherMaintainers)
             {
-                while(list($index, $iUserId) = each($aOtherMaintainers))
+                foreach ($aOtherMaintainers as $index => $iUserId)
                 {
                     $oUser = new User($iUserId);
 
@@ -905,7 +905,7 @@ class maintainer
 
             if($aOtherSuperMaintainers)
             {
-                while(list($index, $iUserId) = each($aOtherSuperMaintainers))
+                foreach ($aOtherSuperMaintainers as $index => $iUserId)
                 {
                     $oUser = new User($iUserId);
                     echo "$oUser->sRealname*<br>\n";
@@ -929,7 +929,7 @@ class maintainer
             $aOtherApps = Maintainer::getAppsMaintained($oUser);
             if($aOtherApps)
             {
-                while(list($index, list($iAppIdOther, $iVersionIdOther, $bSuperMaintainerOther)) = each($aOtherApps))
+                foreach ($aOtherApps as $index => list($iAppIdOther, $iVersionIdOther, $bSuperMaintainerOther))
                 {
                     $oApp = new Application($iAppIdOther);
 
@@ -1052,7 +1052,7 @@ class maintainer
 
         if($this->iVersionId && $oMaintainer->iVersionId != $this->iVersionId)
         {
-            $hResult = query_parameters("UPDATE appMaintainers SET versionId = '?' 
+            $hResult = query_parameters("UPDATE appMaintainers SET versionId = '?'
                                          WHERE maintainerId = '?'",
                                          $this->iVersionId, $this->iMaintainerId);
 
@@ -1062,7 +1062,7 @@ class maintainer
 
         if($this->iAppId && $oMaintainer->iAppId != $this->iAppId)
         {
-            $hResult = query_parameters("UPDATE appMaintainers SET appId = '?' 
+            $hResult = query_parameters("UPDATE appMaintainers SET appId = '?'
                                          WHERE maintainerId = '?'",
                                          $this->iAppId, $this->iMaintainerId);
 
@@ -1212,10 +1212,10 @@ class maintainer
       {
         $iLastWarnTime = strtotime($this->sNotificationTime);
         $iLastWarnAgeInSeconds = strtotime("now") - $iLastWarnTime;
-                                                                        
+
         if($bDebugOutputEnabled)
           echo "iLastWarnAgeInSeconds: ".$iLastWarnAgeInSeconds."\n";
- 
+
         // if it hasn't been at least $iNotificationIntervalDays since the last
         // warning we can skip even checking the user
         if($iLastWarnAgeInSeconds < (iNotificationIntervalDays * 24 * 60 * 60))
@@ -1285,7 +1285,7 @@ class maintainer
       foreach($oQueuedEntries->aVersionIds as $iVersionId)
       {
         $oVersion = new Version($iVersionId);
-          
+
         $sMsg .= 'Version '.$sFullname.' ('.$oVersion->objectMakeUrl().'">'.$sFullname.
           ') is queued and ready for processing.';
 
@@ -1475,7 +1475,7 @@ class maintainer
         $this->delete(); // delete ourselves from the database
         break;
       }
-      
+
       // common end of our message
       $oNotificationUpdate->sMsg.= "\n\nThanks,\n";
       $oNotificationUpdate->sMsg.= "Appdb Admins\n";

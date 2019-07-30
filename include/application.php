@@ -44,7 +44,7 @@ class Application {
     var $iMaintainerRequest; /* Temporary variable for tracking maintainer
                                 requests on app submission.  Value denotes type of request */
 
-    /**    
+    /**
      * constructor, fetches the data.
      */
     public function Application($iAppId = null, $oRow = null)
@@ -59,7 +59,7 @@ class Application {
         {
             /* fetch this applications information */
             $sQuery = "SELECT *
-                    FROM appFamily 
+                    FROM appFamily
                     WHERE appId = '?'";
             if($hResult = query_parameters($sQuery, $iAppId))
                 $oRow = query_fetch_object($hResult);
@@ -194,7 +194,7 @@ class Application {
                                   $this->sName, $this->iAppId))
                 return false;
             $sWhatChanged .= "Name was changed from ".$oApp->sName." to ".$this->sName.".\n\n";
-        }     
+        }
 
         if ($this->sDescription && ($this->sDescription!=$oApp->sDescription))
         {
@@ -219,7 +219,7 @@ class Application {
                 return false;
             $sWhatChanged .= "Web page was changed from ".$oApp->sWebpage." to ".$this->sWebpage.".\n\n";
         }
-     
+
         if ($this->iVendorId && ($this->iVendorId!=$oApp->iVendorId))
         {
             if (!query_parameters("UPDATE appFamily SET vendorId = '?' WHERE appId = '?'",
@@ -257,7 +257,7 @@ class Application {
     }
 
     /**
-    * Deletes the application from the database. 
+    * Deletes the application from the database.
     * and request the deletion of linked elements.
     */
     public function purge()
@@ -277,7 +277,7 @@ class Application {
 
         /* Flag the entry as deleted */
                 $sQuery = "DELETE FROM appFamily
-                WHERE appId = '?' 
+                WHERE appId = '?'
                 LIMIT 1";
         if(!($hResult = query_parameters($sQuery, $this->iAppId)))
             $bSuccess = false;
@@ -306,7 +306,7 @@ class Application {
 
         /* Flag the entry as deleted */
         $sQuery = "UPDATE appFamily SET state = 'deleted'
-                   WHERE appId = '?' 
+                   WHERE appId = '?'
                    LIMIT 1";
         if(!($hResult = query_parameters($sQuery, $this->iAppId)))
             $bSuccess = false;
@@ -445,7 +445,7 @@ class Application {
                 $sSubject =  "Submitted application rejected";
                 $sMsg  = "The application you submitted (".$this->sName.") has been rejected by ".$_SESSION['current']->sRealname.". ";
                 $sMsg .= "A link to your queue of applications and versions will show up on the left hand side of the Appdb site once you have logged in. ";
-                $sMsg .= "Clicking on that link will allow you to modify and resubmit the application. ";                
+                $sMsg .= "Clicking on that link will allow you to modify and resubmit the application. ";
                 $sMsg .= APPDB_ROOT."objectManager.php?sClass=application_queue".
                         "&amp;bIsQueue=true&amp;bIsRejected=true&amp;iId=".$this->iAppId."&amp;sTitle=".
                         "Edit+Application\n";
@@ -463,7 +463,7 @@ class Application {
 
     public static function countWithRating($sRating)
     {
-        $sQuery = "SELECT DISTINCT count(appId) as total 
+        $sQuery = "SELECT DISTINCT count(appId) as total
                        FROM appVersion
                        WHERE rating = '?'
                        AND state = 'accepted'";
@@ -478,7 +478,7 @@ class Application {
     public static function getWithRating($sRating, $iOffset, $iItemsPerPage)
     {
         $aApps = array();
-        $sQuery = "SELECT DISTINCT appVersion.appId, appName 
+        $sQuery = "SELECT DISTINCT appVersion.appId, appName
                        FROM appVersion, appFamily WHERE
                            appVersion.appId = appFamily.appId
                        AND
@@ -486,7 +486,7 @@ class Application {
                        AND
                            appVersion.state = 'accepted'
                        ORDER BY appName ASC LIMIT ?, ?";
-        
+
         if($hResult = query_parameters($sQuery, $sRating, $iOffset, $iItemsPerPage))
         {
             while($aRow = query_fetch_row($hResult))
@@ -519,7 +519,7 @@ class Application {
                     if($aClean['sReplyText'])
                     {
                         $sMsg .= "Appdb admin reply text:\n";
-                        $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                        $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                     }
 
                     addmsg("The application was successfully added into the database.", "green");
@@ -542,11 +542,11 @@ class Application {
                         "&amp;bIsQueue=true&amp;bIsRejected=true&amp;iId=".$this->iAppId."&amp;sTitle=".
                         "Edit+Application\n";
 
-                // if sReplyText is set we should report the reason the application was rejected 
+                // if sReplyText is set we should report the reason the application was rejected
                 if($aClean['sReplyText'])
                 {
                     $sMsg .= "Reason given:\n";
-                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                 }
 
                 addmsg("Application rejected.", "green");
@@ -555,7 +555,7 @@ class Application {
         $sEmail = User::get_notify_email_address_list($this->iAppId);
         if($sEmail)
             mail_appdb($sEmail, $sSubject ,$sMsg);
-    } 
+    }
 
     public function objectShowPreview()
     {
@@ -606,7 +606,7 @@ class Application {
                 if($this->iSubmitterId != $_SESSION['current']->iUserId)
                 {
                     $sVendorHelp .= "The user added a new one; review ".
-                                    "it in the Developer form below or ". 
+                                    "it in the Developer form below or ".
                                     "replace it with an existing one.";
                 } else
                 {
@@ -643,13 +643,13 @@ class Application {
         // Allow user to apply as super maintainer if this is a new app
         if(!$this->iAppId)
         {
-            $sMaintainerOptions = 
+            $sMaintainerOptions =
                 "<input type=\"radio\" name=\"iMaintainerRequest\" value=\"0\">".
                 "I would not like to become a maintainer<br>\n".
-                "<input type=\"radio\" name=\"iMaintainerRequest\" ". 
+                "<input type=\"radio\" name=\"iMaintainerRequest\" ".
                 "value=\"".MAINTAINER_REQUEST."\">".
                 "I would like to be a maintainer of the new version only<br>\n".
-                "<input type=\"radio\" name=\"iMaintainerRequest\" ". 
+                "<input type=\"radio\" name=\"iMaintainerRequest\" ".
                 "value=\"".SUPERMAINTAINER_REQUEST."\">".
                 "I would like to be a super maintainer for all versions of this application<br>\n";
 
@@ -792,7 +792,7 @@ class Application {
         if ($other_maintainers)
         {
             $maintainers = "<ul>\n";
-            while(list($index, $userIdValue) = each($other_maintainers))
+            foreach ($other_maintainers as $index => $userIdValue)
             {
                 $oUser = new User($userIdValue);
                 $maintainers .= "<li>".$oUser->objectMakeLink()."</li>\n";
@@ -953,10 +953,10 @@ EOT;
 
         for($i = 1; $oRow = query_fetch_object($hResult); $i++)
         {
-          
+
             $oVendor = new vendor($oRow->vendorId);
             $oApp = new application($oRow->appId);
-            
+
             $oTableRow = new TableRow();
             $oTableRow->AddTextCell($oApp->objectMakeLink());
             $oTableRow->AddTextCell($oRow->description);
@@ -1029,7 +1029,7 @@ EOT;
             if(strstr($sWhereFilter, 'versions.id'))
             {
                 $sExtraTables .= ','.BUGZILLA_DB.'.versions';
-                $sBugzillaQuery = ' AND versions.value = appVersion.ratingRelease 
+                $sBugzillaQuery = ' AND versions.value = appVersion.ratingRelease
                                     AND versions.product_id = '.BUGZILLA_PRODUCT_ID.' ';
             }
 
@@ -1194,7 +1194,7 @@ EOT;
     {
         if($_SESSION['current']->hasPriv("admin"))
             return TRUE;
-        
+
         if(isset($this) && is_object($this) && $this->iAppId)
         {
             if(maintainer::isUserSuperMaintainer($_SESSION['current'],
@@ -1257,7 +1257,7 @@ EOT;
             echo "not how well that version works or how great you think a new feature is.</p>\n";
             echo "<p>When you reach the \"Test Form\" part (What works, What doesn't work, etc) please be detailed \n";
             echo "about how well it worked and if any workarounds were needed but do NOT paste chunks of terminal output.</p>\n";
-            echo "<p>Please write information in proper English with correct grammar and punctuation!</p>\n";            
+            echo "<p>Please write information in proper English with correct grammar and punctuation!</p>\n";
             echo "<b><span style=\"color:red\">Please only submit applications/versions that you have tested.\n";
             echo "Submissions without test information or not using the provided template will be rejected.\n";
             echo "If you are unable to see the in-browser editors below, please try Firefox, Mozilla or Opera browsers.\n</span></b>";
@@ -1282,13 +1282,13 @@ EOT;
             if(strstr($sWhereFilter, 'versions.id'))
             {
                 $sExtraTables .= ','.BUGZILLA_DB.'.versions';
-                $sBugzillaQuery = ' AND versions.value = appVersion.ratingRelease 
+                $sBugzillaQuery = ' AND versions.value = appVersion.ratingRelease
                                     AND versions.product_id = '.BUGZILLA_PRODUCT_ID.' ';
             }
 
             if($sWhereFilter)
                 $sWhereFilter = " AND $sWhereFilter";
-            $sWhereFilter = " AND appVersion.appId = appFamily.appId 
+            $sWhereFilter = " AND appVersion.appId = appFamily.appId
                               $sBugzillaQuery
                               $sWhereFilter";
         }

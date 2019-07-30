@@ -15,7 +15,7 @@ class Category {
     var $aSubcatsIds;        // an array that contains the appId of every application linked to this category
 
 
-    /**    
+    /**
      * constructor, fetches the data.
      */
     function Category($iCatId = null)
@@ -42,7 +42,7 @@ class Category {
             }
 
             /*
-             * We fetch applicationsIds. 
+             * We fetch applicationsIds.
              */
             $sQuery = "SELECT appId
                        FROM appFamily
@@ -57,7 +57,7 @@ class Category {
             }
 
             /*
-             * We fetch subcatIds. 
+             * We fetch subcatIds.
              */
             $sQuery = "SELECT catId
                        FROM appCategory
@@ -105,8 +105,8 @@ class Category {
     }
 
 
-    /**    
-     * Deletes the category from the database. 
+    /**
+     * Deletes the category from the database.
      */
     function delete()
     {
@@ -116,8 +116,8 @@ class Category {
         if(sizeof($this->aApplicationsIds)>0)
             return FALSE;
 
-        $sQuery = "DELETE FROM appCategory 
-                    WHERE catId = '?' 
+        $sQuery = "DELETE FROM appCategory
+                    WHERE catId = '?'
                     LIMIT 1";
         query_parameters($sQuery, $this->iCatId);
 
@@ -243,7 +243,7 @@ class Category {
         /* add on all apps in each category this category includes */
         if($this->aSubcatsIds)
         {
-            while(list($i, $iSubcatId) = each($this->aSubcatsIds))
+            foreach ($this->aSubcatsIds as $i => $iSubcatId)
             {
                 $subCat = new Category($iSubcatId);
                 $totalApps += $subCat->getApplicationCount($depth);
@@ -251,7 +251,7 @@ class Category {
         }
 
         $totalApps += sizeof($this->aApplicationsIds); /* add on the apps at this category level */
-        
+
         return $totalApps;
     }
 
@@ -262,7 +262,7 @@ class Category {
     {
         $sStr = "";
         $iCatCount = 0;
-        while(list($iCatIdx, list($iCatId, $sName)) = each($aPath))
+        foreach ($aPath as $iCatIdx => list($iCatId, $sName))
         {
             if($sName == "ROOT")
                 $sCatname = "Main";
@@ -362,19 +362,19 @@ class Category {
                 <tr>
                 <td width=\"15%\" class=\"box-label\"><b>Category name</b></td>
                 <td class=\"box-body\">
-                <input type=\"text\" size=\"50\" name=\"sName\" value=\"".$this->sName."\"> 
+                <input type=\"text\" size=\"50\" name=\"sName\" value=\"".$this->sName."\">
                 </td>
                 </tr>
                 <tr>
                 <td width=\"15%\" class=\"box-label\"><b>Description</b></td>
                 <td class=\"box-body\">
-                <input type=\"text\" size=\"50\" name=\"sDescription\" value=\"".$this->sDescription."\"> 
+                <input type=\"text\" size=\"50\" name=\"sDescription\" value=\"".$this->sDescription."\">
                 </td>
                 </tr>
                 <tr>
                 <td width=\"15%\" class=\"box-label\"><b>Parent</b></td>
                 <td class=\"box-body\">
-                ".html_select("iParentId",$aCatIds,$iParentId, $aCatNames)." 
+                ".html_select("iParentId",$aCatIds,$iParentId, $aCatNames)."
                 </td>
                 </tr>
                 </table>";
@@ -454,8 +454,8 @@ class Category {
             $oTableRow->AddTextCell("Description");
             $oTableRow->AddTextCell("No. Apps");
             $oTable->SetHeader($oTableRow);
-            
-            while(list($i,$iSubcatId) = each($aSubs))
+
+            foreach ($aSubs as $i => $iSubcatId)
             {
                 $oSubCat= new Category($iSubcatId);
                 $sUrl = $oSubCat->objectMakeUrl();
@@ -494,7 +494,7 @@ class Category {
             echo html_frame_start();
             echo "<div class=\"whq-breadcrumb\"><b>Category:</b> {$sCatFullPath}</div>\n";
             echo html_frame_end();
-            
+
             echo html_frame_start();
 
             $oTable = new Table();
@@ -508,7 +508,7 @@ class Category {
 
             $oTable->SetHeader($oTableRow);
 
-            while(list($i, $iAppId) = each($aApps))
+            foreach ($aApps as $i => $iAppId)
             {
                 $oApp = new Application($iAppId);
                 $sUrl = $oApp->objectMakeUrl();
@@ -526,7 +526,7 @@ class Category {
 
                 $oTable->AddRow($oTableRow);
             }
-            
+
             // output table
             echo $oTable->GetString();
 

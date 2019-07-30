@@ -44,7 +44,7 @@ class version {
     var $iObsoleteBy; /* Whether this version is marked as obsolete, and if so which
                          version its votes should be moved to. */
     var $iMaintainerRequest; /* Temporary variable for version submisson.
-                                Indicates whether the user wants to become a 
+                                Indicates whether the user wants to become a
                                 maintainer or monitor of the version being submitted.
                                 Value denotes type of request. */
 
@@ -126,7 +126,7 @@ class version {
                     $oMaintainer->iAppId = $this->iAppId;
                     $oMaintainer->iVersionId = $this->iVersionId;
                     $oMaintainer->iUserId = $_SESSION['current']->iUserId;
-                    $oMaintainer->sMaintainReason = "This user submitted the version;". 
+                    $oMaintainer->sMaintainReason = "This user submitted the version;".
                                                     "auto-queued.";
                     $oMaintainer->bSuperMaintainer = 0;
                     $oMaintainer->create();
@@ -168,7 +168,7 @@ class version {
                                   $this->sName, $this->iVersionId))
                 return false;
             $sWhatChanged .= "Name was changed from:\n\t'".$oVersion->sName."'\nto:\n\t'".$this->sName."'\n\n";
-        }     
+        }
 
         if ($this->sDescription && ($this->sDescription!=$oVersion->sDescription))
         {
@@ -205,7 +205,7 @@ class version {
             else
                 $sWhatChanged .= "Rating was changed to ".$this->sTestedRating.".\n\n";
         }
-     
+
         if ($this->iAppId && ($this->iAppId!=$oVersion->iAppId))
         {
             $oAppBefore = new Application($oVersion->iAppId);
@@ -282,7 +282,7 @@ class version {
 
         /* now remove the version from the DB */
         $hResult = query_parameters("DELETE FROM appVersion
-                WHERE versionId = '?' 
+                WHERE versionId = '?'
                 LIMIT 1", $this->iVersionId);
         if(!$hResult)
             $bSuccess = FALSE;
@@ -314,7 +314,7 @@ class version {
 
         /* now flag the version as deleted */
         $hResult = query_parameters("UPDATE appVersion SET state = 'deleted'
-                                     WHERE versionId = '?' 
+                                     WHERE versionId = '?'
                                      LIMIT 1", $this->iVersionId);
         if(!$hResult)
             $bSuccess = FALSE;
@@ -343,8 +343,8 @@ class version {
             $this->SendNotificationMail();
 
             /* Unqueue matching maintainer request */
-            $hResultMaint = query_parameters("SELECT maintainerId FROM 
-            appMaintainers WHERE userId = '?' AND versionId = '?'", 
+            $hResultMaint = query_parameters("SELECT maintainerId FROM
+            appMaintainers WHERE userId = '?' AND versionId = '?'",
             $this->iSubmitterId, $this->iVersionId);
 
             if($hResultMaint && query_num_rows($hResultMaint))
@@ -469,7 +469,7 @@ class version {
             }
             $sMsg .= $aClean['sReplyText']."\n";
             $sMsg .= "We appreciate your help in making the Version Database better for all users.";
-        
+
             mail_appdb($oSubmitter->sEmail, $sSubject ,$sMsg);
         }
     }
@@ -477,7 +477,7 @@ class version {
     private function SendNotificationMail($sAction="add",$sMsg=null)
     {
         global $aClean;
-        
+
         // use 'sReplyText' if it is defined, otherwise define the value as an empty string
         if(!isset($aClean['sReplyText']))
             $aClean['sReplyText'] = "";
@@ -499,7 +499,7 @@ class version {
                     if($aClean['sReplyText'])
                     {
                         $sMsg .= "Appdb admin reply text:\n";
-                        $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                        $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                     }
 
                     addmsg("The version was successfully added into the database.", "green");
@@ -518,11 +518,11 @@ class version {
             break;
             case "delete":
 
-                // if sReplyText is set we should report the reason the application was deleted 
+                // if sReplyText is set we should report the reason the application was deleted
                 if($aClean['sReplyText'])
                 {
                     $sMsg .= "Reason given:\n";
-                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                 }
 
                 addmsg("Version deleted.", "green");
@@ -533,11 +533,11 @@ class version {
                         "&amp;bIsQueue=true&amp;bIsRejected=true&amp;iId=".$this->iVersionId."&amp;".
                         "sTitle=Edit+Version\n";
 
-                // if sReplyText is set we should report the reason the version was rejected 
+                // if sReplyText is set we should report the reason the version was rejected
                 if($aClean['sReplyText'])
                 {
                     $sMsg .= "Reason given:\n";
-                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                 }
 
                 addmsg("Version rejected.", "green");
@@ -546,12 +546,12 @@ class version {
         $sEmail = User::get_notify_email_address_list(null, $this->iVersionId);
         if($sEmail)
             mail_appdb($sEmail, $sSubject ,$sMsg);
-    } 
+    }
 
     public function get_buglink_ids()
     {
         /*
-         * We fetch Bug linkIds. 
+         * We fetch Bug linkIds.
          */
         $aBuglinkIds = array();
         $sQuery = "SELECT *
@@ -626,7 +626,7 @@ class version {
                                                 "appFamily", "appId", "appName");
             $oTableCell = new TableCell($sOptionList);
             $oTableCell->SetClass("color0");
-            
+
             $oTableRow->AddCell($oTableCell);
 
             $oTable->AddRow($oTableRow);
@@ -645,7 +645,7 @@ class version {
         $oTableRow->AddCell($oTableCell);
 
         $oTableRow->AddTextCell('<input size="20" type="text" name="sVersionName" value="'.$this->sName.'">');
-        
+
         $oTable->AddRow($oTableRow);
 
         // version license
@@ -662,7 +662,7 @@ class version {
         // version description
         $oTableRow = new TableRow();
         $oTableRow->SetValign("top");
-        
+
         $oTableCell = new TableCell("Version description");
         $oTableCell->SetBold(true);
         $oTableCell->SetClass("color0");
@@ -883,7 +883,7 @@ class version {
         if(sizeof($aMaintainers) > 0)
         {
             $maintainers .= "<ul>";
-            while(list($index, $userIdValue) = each($aMaintainers))
+            foreach ($aMaintainers as $index => $userIdValue)
             {
                 $oUser = new User($userIdValue);
                 $maintainers .= "<li>".$oUser->objectMakeLink()."</li>";
@@ -947,7 +947,7 @@ class version {
                     }
                 }
             }
-            
+
         } else
         {
             $mtrscmds .= '<form method="post" name="sMessage" action="account.php">'."\n";
@@ -1085,16 +1085,16 @@ EOT;
             $iTestingId = $iNewestId;
 
             // We want all entries to have test data, but old versions might lack it, or data may have been deleted
-            if($iTestingId) 
+            if($iTestingId)
                 $oTest = new testData($iTestingId);
         }
-        else if(!$oTest) 
+        else if(!$oTest)
         {
             // Perhaps we have a cached entry? There should be
             $aTests = $this->getTestResults();
 
             // ... but we cannot be certain
-            if(sizeof($aTests)) 
+            if(sizeof($aTests))
                 $oTest = $aTests[0];
         }
 
@@ -1160,8 +1160,8 @@ EOT;
             echo '</form>'."\n";
         }
         echo '</div></div></div>';
-      
-        // bugs table 
+
+        // bugs table
         echo '<div id="collapse-bugs">';
         echo '<a data-toggle="collapse" data-parent="collapse-bugs" class="no-text-decoration" href="#knownbugs">';
         echo '<h2 id="viewBugs" class="whq-app-title">Known Bugs <span class = "fa fa-plus-square-o"></span></h2>';
@@ -1170,7 +1170,7 @@ EOT;
         echo '<div class="panel-body">';
         view_version_bugs($this->iVersionId, $this->get_buglink_ids());
         echo '</div></div></div>';
-  
+
         // notes / how-to
         echo '<div id="collapse-notes">';
         echo '<a data-toggle="collapse" data-parent="collapse-notes" class="no-text-decoration" href="#notes">';
@@ -1180,7 +1180,7 @@ EOT;
         echo '<div class="panel-body">';
         echo note::displayNotesForEntry($this->iVersionId);
         echo '</div></div></div>';
-     
+
         // Comments Section
         echo '<div id="collapse-comments">';
         echo '<a data-toggle="collapse" data-parent="collapse-comments" class="no-text-decoration" href="#comments">';
@@ -1199,7 +1199,7 @@ EOT;
                            'Comments for this application have been disabled because there are no maintainers.',
                            "","","warning");
         }
-        echo '</div></div></div>'; 
+        echo '</div></div></div>';
     }
 
     public static function lookup_name($versionId)
@@ -1332,7 +1332,7 @@ EOT;
         /* early out if the versionId isn't valid */
         if($this->iVersionId == 0)
             return $aMaintainers;
-    
+
         $hResult = Maintainer::getMaintainersForAppIdVersionId(null, $this->iVersionId);
         $iCount = 0;
         while($oRow = query_fetch_object($hResult))
@@ -1579,13 +1579,13 @@ EOT;
             // if the user is the super maintainer of the application then
             // they are authorized to unqueue versions of this application
             // so the version doesn't have to be queued
-            if($this->iAppId && 
+            if($this->iAppId &&
                maintainer::isUserSuperMaintainer($_SESSION['current'], $this->iAppId))
                 return FALSE;
 
             // if the user is a maintainer of this version then
             // this version doesn't have to be queued
-            if($this->iVersionId && 
+            if($this->iVersionId &&
                maintainer::isUserMaintainer($_SESSION['current'], $this->iVersionId))
                 return FALSE;
 

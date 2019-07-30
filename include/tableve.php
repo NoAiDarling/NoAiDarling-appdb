@@ -47,7 +47,7 @@ class TableVE {
     {
         $hResult = query_appdb($query);
         $id     = query_appdb_insert_id();
-	
+
         $new_query = "SELECT * FROM $table WHERE $idcolumn = $id";
         $this->edit($new_query);
     }
@@ -73,7 +73,7 @@ class TableVE {
             echo "<br>\n";
         }
     }
-    
+
     function view_entry($hResult, $num)
     {
         $nfields = query_num_fields($hResult);
@@ -92,7 +92,7 @@ class TableVE {
         //echo "<th class='box-title' colspan='2'></th></tr>\n";
 
         //echo "<tr><td>\n";
-        
+
         echo html_frame_start("Viewing $titleValue $titleText","80%","",0);
         echo "<table border=0 width='100%' cellspacing=0 cellpadding=2>\n";
 
@@ -106,8 +106,8 @@ class TableVE {
                             echo "<tr><th class='box-label' colspan=2> ".ucfirst($arr[1])." Implementation </th></tr>\n";
                         $cur_impl = $arr[1];
                     }
-		
-                echo "<tr><td width='15%' class='box-label'><b> $field->name </b></td>"; 
+
+                echo "<tr><td width='15%' class='box-label'><b> $field->name </b></td>";
                 echo "<td class='box-body'>";
                 $this->view_entry_output_field($field, $fields[$i], 0);
                 echo "</td></tr>\n";
@@ -134,16 +134,16 @@ class TableVE {
         echo html_frame_start("Update Database",100);
         echo "<input type=submit value='Update Database'>\n";
         echo html_frame_end();
-	
+
         echo "</form>\n";
     }
 
-    
+
     function edit_entry($hResult)
     {
         $nfields = query_num_fields($hResult);
         $fields = query_fetch_array($hResult);
-	
+
         echo html_frame_start(ucfirst($this->mode),"80%","",0);
         echo "<table border=0 width='100%' cellspacing=0 cellpadding=2>\n";
 
@@ -238,13 +238,13 @@ class TableVE {
             echo $this->make_option_list($varname, $value, "appCategory", "catId", "catName");
             return;
         }
-	
+
         if($field->name == "keywords")
         {
             echo "<textarea cols=$len rows=3 name='$varname'>".stripslashes($value)."</textarea>\n";
             return;
         }
-	    
+
         switch($field->type)
         {
         case "string":
@@ -337,7 +337,7 @@ class TableVE {
     function get_id($name)
     {
         reset($this->table_ids);
-        while(list($table, $id) = each($this->table_ids))
+        foreach ($this->table_ids as $table => $id)
         {
             $r = "^$table$";
             //echo "Checking $r against $name <br>\n";
@@ -360,42 +360,42 @@ class TableVE {
         $tables = array();
         $fieldnames = array();
         $num_entries = 0;
-	
-        while(list($varname, $arr) = each($vars))
+
+        foreach ($vars as $varname => $arr)
         {
             if(!ereg("^FIELD_([a-zA-Z_]+)___(.+)$", $varname, $regs))
                 continue;
-				
+
             $tables[$regs[1]][] = $regs[2];
             $fieldnames[$regs[2]] = $arr;
             $num_entries = sizeof($arr);
         }
-	
-        while(list($table, $fields) = each($tables))
+
+        foreach ($tables as $table => $fields)
         {
             echo "<b> $table (".$this->get_id($table).") </b>";
-		
+
             if($fieldnames[$this->get_id($table)])
                 echo "OK!";
-		
+
             echo "<br>\n";
-		
+
             for($i = 0; $i < sizeof($fields); $i++)
                 echo "- $fields[$i] <br>\n";
-		
+
             echo "<br>\n";
         }
 
         for($i = 0; $i < $num_entries; $i++)
         {
             reset($tables);
-            while(list($table, $fields) = each($tables))
+            foreach ($tables as $table => $fields)
             {
                 $update = "UPDATE $table SET ";
-                
+
                 $count = sizeof($fields);
                 reset($fields);
-                while(list($idx, $field) = each($fields))
+                foreach ($fields as $idx => $field)
                 {
                     $count--;
 
@@ -405,7 +405,7 @@ class TableVE {
                     }
                     $key  = "FIELD_".$table."___".$field;
                     $type = $vars["TYPE_$key"][$i];
-				
+
                     if($type == "int")
                         $update .= "$field = ".$vars[$key][$i];
                     else
@@ -414,11 +414,11 @@ class TableVE {
                     if($count)
                         $update .= ", ";
                 }
-			    
+
                 $value = $fieldnames[$this->get_id($table)][$i];
-			
+
                 $update .= " WHERE ".$this->get_id($table)." = $value";
-						
+
                 if(query_appdb($update))
                 {
                     addmsg("Database Operation Complete!","green");

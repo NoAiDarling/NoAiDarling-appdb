@@ -20,7 +20,7 @@ function test_application_delete()
 
     if(!$oUser = create_and_login_user($sTestEmail, $sTestPassword))
         return false;
-    
+
     /* make this user an admin so we can create applications without having them queued */
     $hResult = query_parameters("INSERT into user_privs values ('?', '?')",
                                 $oUser->iUserId, "admin");
@@ -37,14 +37,14 @@ function test_application_delete()
     }
 
     $iAppId = $oApp->iAppId; /* use the iAppId of the application we just created */
-    
+
     for($iVersionIdIndex = 0; $iVersionIdIndex < 10; $iVersionIdIndex++)
     {
         $oVersion = new Version();
         $oVersion->versionName = "Some Version".$iVersionIdIndex;
         $oVersion->description = "Some Version description".$iVersionIdIndex;
         $oVersion->iAppId = $oApp->iAppId;
-        
+
         if(!$oVersion->create())
         {
             delete_app_and_user($oApp, $oUser);
@@ -52,14 +52,14 @@ function test_application_delete()
             return false;
         }
     }
-    
-            
+
+
     delete_app_and_user($oApp, $oUser);
-    
+
     $sQuery = "SELECT appId
                       FROM appVersion
                       WHERE appId = '?'";
-                      
+
     if($hResult = query_parameters($sQuery, $iAppId))
     {
         $iRows = query_num_rows($hResult);
@@ -69,9 +69,9 @@ function test_application_delete()
             return false;
         }
     }
-    
+
     return true;
-    
+
 }
 
 
@@ -101,18 +101,18 @@ function test_application_getWithRating()
     }
 
     $iAppId = $oApp->iAppId; /* use the iAppId of the application we just created */
-    
- 
+
+
     /* Create several versions of the new application to test uniqueness of getWithRating() results */
-    
+
     for($iVersionIdIndex = 0; $iVersionIdIndex < 10; $iVersionIdIndex++)
-    {    
+    {
         $oVersion = new Version();
         $oVersion->versionName = "Some Version".$iVersionIdIndex;
         $oVersion->description = "Some Version description".$iVersionIdIndex;
         $oVersion->iAppId = $oApp->iAppId;
-        
-        
+
+
         /* Create Several Ratings, some duplicate */
         if ($iVersionIdIndex < 4)
         {
@@ -126,45 +126,45 @@ function test_application_getWithRating()
         {
             $oVersion->sTestedRating = "Bronze";
         }
-        
+
         if(!$oVersion->create())
         {
-            delete_app_and_user($oApp, $oUser);  
+            delete_app_and_user($oApp, $oUser);
             error("Failed to create version!");
             return false;
         }
     }
-    
+
 
     $iItemsPerPage = 50;
     $iOffset = 0;
-    $sRating = 'Bronze';        
+    $sRating = 'Bronze';
     $aApps = Application::getWithRating($sRating, $iOffset, $iItemsPerPage);
     $aTest = array();//array to test the uniqueness our query results
-    while(list($i, $iId) = each($aApps)) //cycle through results returned by getWithRating
+    foreach ($aApps as $i => $iId) //cycle through results returned by getWithRating
     {
         if ( in_array($iId, $aTest) ) //if the appId is already in our test results fail unique test
         {
-            delete_app_and_user($oApp, $oUser);  
+            delete_app_and_user($oApp, $oUser);
             error("getWithRating failed to return a unique result set");
             return false;
         }
-           
+
         array_push($aTest, $iId); //push the appId on to our test array
-      
+
     }
-    
- 
-    delete_app_and_user($oApp, $oUser);  
-    
-    
+
+
+    delete_app_and_user($oApp, $oUser);
+
+
     //test to ensure getWithRating doesn't return applications that are queued
-    
+
     //create user without admin priveliges
     if(!$oUser = create_and_login_user($sTestEmail, $sTestPassword))
         return false;
-    
-    
+
+
     $oApp = new Application();
     $oApp->sName = "Some application";
     $oApp->sDescription = "some description";
@@ -176,36 +176,36 @@ function test_application_getWithRating()
         return false;
     }
 
-    $iAppId = $oApp->iAppId; /* use the iAppId of the application we just created */    
-    
+    $iAppId = $oApp->iAppId; /* use the iAppId of the application we just created */
+
     $oVersion = new Version();
     $oVersion->versionName = "Some Version".$iVersionIdIndex;
     $oVersion->description = "Some Version description".$iVersionIdIndex;
     $oVersion->iAppId = $oApp->iAppId;
     $oVersion->sTestedRating = "Bronze";
     $oVersion->objectSetState('queued');
-        
+
     if(!$oVersion->create())
     {
-        delete_app_and_user($oApp, $oUser);  
+        delete_app_and_user($oApp, $oUser);
         error("Failed to create version!");
         return false;
-    }        
-    
-    
+    }
+
+
     $aApps=Application::getWithRating($sRating, $iOffset, $iItemsPerPage);
-        
+
     if ( in_array($iAppId, $aApps )) //if the appId is in our test results fail queued test
     {
-        delete_app_and_user($oApp, $oUser);  
+        delete_app_and_user($oApp, $oUser);
         error("getWithRating failed to return a unique result set");
         return false;
     }
-    
+
     delete_app_and_user($oApp, $oUser);
 
     return true;
-} 
+}
 
 function delete_app_and_user($oApp, $oUser)
 {
@@ -233,7 +233,7 @@ if(!test_application_delete())
 {
     echo "test_application_delete() passed\n";
 }
-    
+
 
 if(!test_application_getWithRating())
 {
@@ -241,8 +241,8 @@ if(!test_application_getWithRating())
     $bTestSuccess = false;
 } else
 {
-    echo "test_application_getWithRating() passed\n"; 
+    echo "test_application_getWithRating() passed\n";
 }
-    
+
 ?>
 

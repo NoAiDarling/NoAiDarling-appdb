@@ -38,8 +38,8 @@ foreach ($topNumberArray as $i => $value)
 echo "</select>";
 
 /**
- * build an array of categories from the current category back up 
- * the tree to the main category 
+ * build an array of categories from the current category back up
+ * the tree to the main category
  */
 $cat_array = Array();
 $cat_name_array = Array();
@@ -104,7 +104,7 @@ $subs = $cat->aSubcatsIds;
 
 if($subs)
 {
-    while(list($i, $id) = each($subs))
+    foreach ($subs as $i => $id)
     {
         $oSubcat = new Category($id);
         /* if this is the current category, select this option */
@@ -133,7 +133,7 @@ if(empty($aClean['iCategoryId']))
                            WHERE appVotes.versionId = appVersion.versionId AND
                            appFamily.appId = appVersion.appId AND
                            appVersion.state = 'accepted'
-                           GROUP BY appVotes.versionId ORDER BY count DESC LIMIT ?", 
+                           GROUP BY appVotes.versionId ORDER BY count DESC LIMIT ?",
                                $aClean['iTopNumber']);
 } else
 {
@@ -164,7 +164,7 @@ if(empty($aClean['iCategoryId']))
 if($hResult)
 {
     echo html_frame_start();
-    
+
     $oTable = new Table();
     $oTable->SetClass("whq-table");
 

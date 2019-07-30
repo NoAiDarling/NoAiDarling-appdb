@@ -12,7 +12,7 @@
  *  - sUserRealname, user's real name
  *  - sWineRelease, user's Wine release
  *  - bIsAdmin, true if user is an administrator
- * 
+ *
  * TODO:
  *  - document iLimit and sOrderBy
  *  - replace sOrderBy with iOrderBy and use constants for each accepted value
@@ -42,7 +42,7 @@ if($_SESSION['current']->hasPriv("admin") &&
 
 if(isset($aClean['sSubmit']) && $aClean['sSubmit'] == "Update")
 {
-    while(list($sKey, $sValue) = each($aClean))
+    foreach ($aClean as $sKey => $sValue)
     {
         /* if a parameter lacks 'pref_' at its head it isn't a */
         /* preference so skip over processing it */
@@ -50,7 +50,7 @@ if(isset($aClean['sSubmit']) && $aClean['sSubmit'] == "Update")
             continue;
         $oUser->setPref($arr[1], $sValue);
     }
-    
+
     /* make sure the user enters the same password twice */
     if ($aClean['sUserPassword'] == $aClean['sUserPassword2'])
     {
@@ -81,9 +81,9 @@ if(isset($aClean['sSubmit']) && $aClean['sSubmit'] == "Update")
         if($oUser->iUserId == $aClean['iUserId'] &&
                 $_SESSION['current']->hasPriv("admin"))
         {
-            if($aClean['bIsAdmin'] == "true") 
+            if($aClean['bIsAdmin'] == "true")
                 $oUser->addPriv("admin");
-            else 
+            else
                 $oUser->delPriv("admin");
             util_redirect_and_exit(BASE."admin/adminUsers.php?iUserId=".$oUser->iUserId.
                     "&amp;sSearch=".$aClean['sSearch']."&amp;iLimit=".$aClean['iLimit'].
@@ -179,7 +179,7 @@ if( !isset($aClean['iUserId']) || $oUser->iUserId != $aClean['iUserId'])
             if($r->show_for_group && !$_SESSION['current']->hasPriv($r->show_for_group))
                 continue;
 
-            $input = html_select("pref_$r->name", explode('|', $r->value_list), 
+            $input = html_select("pref_$r->name", explode('|', $r->value_list),
                                  $oUser->getpref($r->name, $r->def_value));
 
             $oTableRow = new TableRow();

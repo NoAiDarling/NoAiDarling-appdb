@@ -112,7 +112,7 @@ function html_frame_end($text = "")
 function html_select($name, $values, $default = null, $descs = null)
 {
     $str = "<select name=\"{$name}\" class=\"form-control form-control-inline\">\n";
-    while(list($idx, $value) = each($values))
+    foreach ($values as $idx => $value)
     {
         $desc = $value;
         if($descs)
@@ -160,7 +160,7 @@ function html_radiobuttons($aIds, $aOptions, $sName, $sDefault = '', $bLineBreak
             $shChecked = '';
 
         $shRet .= '<input type="radio" name="'.$sName.'" value="'.$aIds[$i]."\"$shChecked> " . $aOptions[$i];
-        
+
         if($bLineBreaks)
             $shRet .= '<br />';
     }
