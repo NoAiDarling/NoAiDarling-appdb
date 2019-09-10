@@ -9,21 +9,12 @@
 class session
 {
     // defines
-    private $_server;
-    private $_expire;
-    private $_db;
     private $name;
     public $msg;
 
     // create session object
     public function __construct ($name, $server = "127.0.0.1", $expire = 30)
     {
-        // set the connection server
-        $this->_server = $server;
-        
-        // set the session and cookie expiration time in days (default 30 days)
-        $this->_expire = (60 * 60 * 24 * $expire);
-
         // set name for this session
         $this->name = $name;
 
@@ -32,28 +23,18 @@ class session
         ini_set('session.use_cookies', true);
         ini_set('session.use_only_cookies', true);
 
-        // setup session object
-        session_set_save_handler(
-                                 array(&$this, "_open"), 
-                                 array(&$this, "_close"), 
-                                 array(&$this, "_read"),
-                                 array(&$this, "_write"), 
-                                 array(&$this, "_destroy"), 
-                                 array(&$this, "_gc")
-                                );
+        // use memcached
+        ini_set('session.save_handler', 'redis');
+        ini_set('session.save_path', "tcp://{$server}:6379?&database=2");
 
-        // default lifetime on session cookie
-        session_set_cookie_params(
-                                  $this->_expire,
-                                  '/'
-                                 );
+        // default lifetime on session cookie expiration (default 30 days)
+        ini_set('session.gc_maxlifetime', (60 * 60 * 24 * $expire));
+        session_set_cookie_params((60 * 60 * 24 * $expire), '/');
 
         // start the loaded session
-        session_start();
-
-        // make sure we have a valid memcache server connection
-        if (!$this->_db->getVersion())
+        if (!session_start())
         {
+            // session failed to start
             trigger_error("Unable to Connect to Session Server", E_USER_ERROR);
         }
     }
@@ -116,52 +97,6 @@ class session
         }
         $_SESSION['_msg'] = array();
     }
-
-    // connect to session
-    public function _open ($save_path, $session_name)
-    {
-        $this->_db = new Memcache;
-        return $this->_db->connect($this->_server, "11211");
-    }
-
-    // close the session
-    public function _close ()
-    {
-        return $this->_db->close();
-    }
-
-    // restore a session from memory
-    public function _read ($id)
-    {
-        return $this->_db->get($id);
-    }
-
-    // write the session
-    public function _write ($id, $data)
-    {
-        if ($this->_db->get($id))
-        {
-            $this->_db->replace($id, $data, null, $this->_expire);
-        }
-        else
-        {
-            $this->_db->set($id, $data, null, $this->_expire);
-        }
-        return true;
-    }
-
-    // Delete the Session
-    public function _destroy ($id)
-    {
-        return $this->_db->delete($id, 0);
-    }
-
-    // Garbage Collector (Not Needed for MemCache)
-    public function _gc ($maxlifetime)
-    {
-        return true;
-    }
-
 }
 // end session
 
