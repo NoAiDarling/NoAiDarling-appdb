@@ -332,7 +332,7 @@ class ObjectManager
         $this->showNumberOfResults($oObject);
 
         /* Should we let the class draw its own custom table? */
-        if(method_exists($this->sClass, 'objectWantCustomDraw') && 
+        if(method_exists($this->sClass, 'objectWantCustomDraw') &&
            $oObject->objectWantCustomDraw('table', $sQueued))
             $oObject->objectDrawCustomTable($hResult, $sQueued, $this);
         else
@@ -419,7 +419,7 @@ class ObjectManager
             echo html_frame_start($sReplyFieldHeader, "90%", "", 0);
             echo "<table width='100%' border=0 cellpadding=2 cellspacing=0>\n";
             echo '<tr valign=top><td class="color0"><b>E-mail Text</b></td>',"\n";
-            echo '<td><textarea name="sReplyText" style="width: 100%" cols="80" '. 
+            echo '<td><textarea name="sReplyText" style="width: 100%" cols="80" '.
                 'rows="10">'.$sDefaultReply.'</textarea></td></tr>',"\n";
         }
         if($this->getIsQueue())
@@ -446,7 +446,7 @@ class ObjectManager
                 echo '<tr valign=top><td class="color0"></td>',"\n";
                 echo '<td class="color0">';
                 echo '<span class="pseudolink" onClick="document.forms[\'sQform\'][\'sReplyText\'].value += \''.addcslashes(htmlspecialchars($sReply),"'\r\n").'&nbsp;\';">'.nl2br($sReply).'</span>';
-                echo '</td>',"\n";    
+                echo '</td>',"\n";
             }
             // end output for common responses
             /////////////////////////////////////////////////
@@ -455,7 +455,7 @@ class ObjectManager
 
         /* buttons for operations we can perform on this entry */
         echo '<tr valign=top><td class=color3 align=center colspan=2>' ,"\n";
-        echo '<input name="sSubmit" type="submit" value="Submit" class="button" '. 
+        echo '<input name="sSubmit" type="submit" value="Submit" class="button" '.
                 '>',"\n";
         if(!$this->getOptionalSetting("objectHideDelete", FALSE))
         {
@@ -948,7 +948,7 @@ class ObjectManager
                 if($oCandidate->objectGetId() == $oParent->objectGetId())
                     continue;
 
-                echo html_tr(array($oCandidate->objectMakeLink(), 
+                echo html_tr(array($oCandidate->objectMakeLink(),
                                    "<a href=\"".$this->makeUrl('changeParent', $this->iId). "&amp;iNewId=".$oCandidate->objectGetId()."\">Move here</a>"),
                              ($i % 2) ? "color0" : "color1");
                 $i++;
@@ -1022,7 +1022,7 @@ class ObjectManager
                 if($oCandidate->objectGetId() == $this->iId)
                     continue;
 
-                echo html_tr(array($oCandidate->objectMakeLink(), 
+                echo html_tr(array($oCandidate->objectMakeLink(),
                                    "<a href=\"".$this->makeUrl("moveChildren", $this->iId). "&amp;iNewId=".$oCandidate->objectGetId()."\">Move here</a>"),
                              ($i % 2) ? "color0" : "color1");
                 $i++;
@@ -1463,7 +1463,7 @@ class ObjectManager
                 $this->oObject = $oObject;
                 $this->delete_entry($aClean['sReplyText']);
                 break;
-                
+
             case "Cancel":
                 break;
 
@@ -1592,7 +1592,7 @@ class ObjectManager
     }
 
     /* Output headers for a table */
-    private function outputHeader($sClass)
+    private function outputHeader($sClass = "")
     {
         $oObject = new $this->sClass();
         $oTableRow = $oObject->objectGetHeader($this->sState);
@@ -1667,12 +1667,12 @@ class ObjectManager
 
         $iItemsPerPage = $iDefaultPerPage;
 
-        if ( isset($aClean['iItemsPerPage']) && 
+        if ( isset($aClean['iItemsPerPage']) &&
              in_array($aClean['iItemsPerPage'], $aItemsPerPage) )
         {
             $iItemsPerPage = $aClean['iItemsPerPage'];
         }
-        
+
         // if $bItemsPerPageSelector is true, display the items
         // per-page dropdown and update button
         if($bItemsPerPageSelector)
