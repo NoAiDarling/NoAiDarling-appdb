@@ -46,7 +46,7 @@ if(isset($aClean['sSubmit']) && $aClean['sSubmit'] == "Update")
     {
         /* if a parameter lacks 'pref_' at its head it isn't a */
         /* preference so skip over processing it */
-        if(!ereg("^pref_(.+)$", $sKey, $arr))
+        if(!preg_match("/^pref_(.+)$/", $sKey, $arr))
             continue;
         $oUser->setPref($arr[1], $sValue);
     }
