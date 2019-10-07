@@ -100,7 +100,7 @@ class TableVE {
         {
             $field = query_fetch_field($hResult, $i);
 
-                if(ereg("^impl_(.+)$", $field->table, $arr))
+                if(preg_match("/^impl_(.+)$/", $field->table, $arr))
                     {
                         if($cur_impl != $arr[1])
                             echo "<tr><th class='box-label' colspan=2> ".ucfirst($arr[1])." Implementation </th></tr>\n";
@@ -154,7 +154,7 @@ class TableVE {
             $field = query_fetch_field($hResult, $i);
             $len   = query_field_len($hResult, $i);
 
-            if(ereg("^impl_(.+)$", $field->table, $arr))
+            if(preg_match("/^impl_(.+)$/", $field->table, $arr))
             {
                 if($cur_impl != $arr[1])
                     echo "<tr><th class='box-label' colspan=2> ".ucfirst($arr[1])." Implementation </th></tr>\n";
@@ -339,11 +339,8 @@ class TableVE {
         reset($this->table_ids);
         foreach ($this->table_ids as $table => $id)
         {
-            $r = "^$table$";
-            //echo "Checking $r against $name <br>\n";
-            if(ereg($r, $name))
+            if(preg_match("/^$table$/", $name))
             {
-                //echo "ID for $name -> $id <br>\n";
                 return $id;
             }
         }
@@ -363,7 +360,7 @@ class TableVE {
 
         foreach ($vars as $varname => $arr)
         {
-            if(!ereg("^FIELD_([a-zA-Z_]+)___(.+)$", $varname, $regs))
+            if(!preg_match("/^FIELD_([a-zA-Z_]+)___(.+)$/", $varname, $regs))
                 continue;
 
             $tables[$regs[1]][] = $regs[2];
@@ -424,7 +421,7 @@ class TableVE {
                     addmsg("Database Operation Complete!","green");
                 }
 
-                if(ereg("^impl_.+$", $table))
+                if(preg_match("/^impl_.+$/", $table))
                 {
                     $value = $fieldnames["apiid"][$i];
                     query_parameters("UPDATE ? SET lastmodby = '?' WHERE apiid = '?'",
