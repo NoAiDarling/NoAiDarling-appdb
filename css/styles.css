@@ -68,7 +68,7 @@ a.btn, a.btn:visited {
     overflow: auto;
 }
 
-.carousel-control.left, 
+.carousel-control.left,
 .carousel-control.right {
     background-image: none
 }
@@ -194,7 +194,7 @@ a.btn, a.btn:visited {
     color: #ffffff;
     margin: 1em 0 1em 120px;
 }
-#whq-footer IMG { vertical-align: middle; }
+#whq-footer IMG { vertical-align: middle; width: 150px; }
 #whq-footer .glyphicon { vertical-align: -18%; }
 #whq-footer A          { color: #ffffff; text-decoration: none; }
 #whq-footer A:visited  { color: #ffffff; }
@@ -241,7 +241,7 @@ a.btn, a.btn:visited {
     float: none;
     width: 160px;
     overflow: hidden;
-    font-size: 95%; 
+    font-size: 95%;
     background: rgba(149,73,58,0.98);
     background: linear-gradient(to right, rgba(149,73,58,0.7) 0%,
                 rgba(149,73,58,0.95) 10%,
@@ -345,9 +345,9 @@ DIV.newsblock       { margin: 0 5px 25px 10px; padding: 0; }
 .inline             { display: inline-block; }
 .small              { font-size: 8pt; }
 .cursor-pointer     { cursor: pointer; }
-.no-text-decoration { 
-    text-decoration: none !important; 
-    
+.no-text-decoration {
+    text-decoration: none !important;
+
 }
 
 /* IMG options */
@@ -672,10 +672,10 @@ table.whq-table tbody tr:nth-child(odd) td {
 }
 /* used for the test report form */
 table.whq-table-striped tbody tr:nth-child(odd) td {
-   background-color: #E0E0E0; 
+   background-color: #E0E0E0;
 }
 table.whq-table-striped tbody tr:nth-child(even) td {
-   background-color: #C0C0C0; 
+   background-color: #C0C0C0;
 }
 
 /* box */
@@ -690,7 +690,7 @@ table.whq-table-striped tbody tr:nth-child(even) td {
 }
 
 TD.cline {
-    background-color: #EEEEEE; color: #000000; 
+    background-color: #EEEEEE; color: #000000;
     text-align: center; font-weight: bold; font-size: 10pt;
 }
 
