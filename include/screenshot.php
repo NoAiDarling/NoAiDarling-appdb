@@ -564,8 +564,8 @@ class screenshot
         else
             $url = APPDB_ROOT."data/";
         $this->sDescription = preg_replace('/\n/', '', $this->sDescription);
-        return "<div class=\"whq-shot\"><img src=\"".APPDB_SCREENSHOT_URL."thumbnails/".$this->iScreenshotId."\" style=\"width:130px;\" ".
-               "alt=\"{$this->sDescription}\" data-shot=\"".APPDB_SCREENSHOT_URL.$this->iScreenshotId."\"><i class=\"fa fa-search-plus\"></i></div>\n";
+        return "<div class=\"whq-shot\"><img src=\"".$url."thumbnails/".$this->iScreenshotId."\" style=\"width:130px;\" ".
+               "alt=\"{$this->sDescription}\" data-shot=\"".$url.$this->iScreenshotId."\"><i class=\"fa fa-search-plus\"></i></div>\n";
     }
 
     public static function objectGetItemsPerPage($sState = 'accepted')
