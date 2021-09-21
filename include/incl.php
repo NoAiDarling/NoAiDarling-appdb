@@ -44,7 +44,7 @@ $_APPDB_debugLog = "";
  * Init Session (stores user info in session)
  */
 
-$session = new session("whq_appdb");
+$session = new session("whq_appdb", APPDB_SESSION_SERVER);
 $session->register("current");
 if(!isset($_SESSION['current']))
 {

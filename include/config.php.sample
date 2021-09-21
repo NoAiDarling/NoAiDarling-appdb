@@ -37,6 +37,10 @@ define("RECAPTCHA_SECRET","");
 // How old (days) a test report has to before it is judged to be aged
 define("TESTDATA_AGED_THRESHOLD", 175);
 
+/*
+ * session server (redis url)
+ */
+define("APPDB_SESSION_SERVER", "tcp://127.0.0.1:6379?&database=2");
 
 /*
  * apps database info

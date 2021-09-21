@@ -13,10 +13,14 @@ class session
     public $msg;
 
     // create session object
-    public function __construct ($name, $server = "127.0.0.1", $expire = 30)
+    public function __construct ($name, $server = "", $expire = 30)
     {
         // set name for this session
         $this->name = $name;
+
+        // require server setting
+        if (empty($server))
+            trigger_error("No Session Server Defined!", E_USER_ERROR);
 
         // define options for sessions
         ini_set('session.name', $this->name);
@@ -25,7 +29,7 @@ class session
 
         // use memcached
         ini_set('session.save_handler', 'redis');
-        ini_set('session.save_path', "tcp://{$server}:6379?&database=2");
+        ini_set('session.save_path', "{$server}");
 
         // default lifetime on session cookie expiration (default 30 days)
         ini_set('session.gc_maxlifetime', (60 * 60 * 24 * $expire));
