@@ -176,42 +176,42 @@ else
         <div id="carouselScreenshots" class="carousel slide container col-md-6" data-ride="carousel">
             <div class="carousel-inner" style="margin-bottom:10px">
                 <div class="item active">
-                    <img src="images/steam.jpg" alt="First slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/steam.jpg" alt="First slide">
                 </div>
                 <div class="item">
-                    <img src="images/outlook2010.jpg" alt="Second slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/outlook2010.jpg" alt="Second slide">
                 </div>
                 <div class="item">
-                    <img src="images/eveonline.jpg" alt="Third slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/eveonline.jpg" alt="Third slide">
                 </div>
                 <div class="item">
-                    <img src="images/photoshopcc2015.jpg" alt="Fourth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/photoshopcc2015.jpg" alt="Fourth slide">
                 </div>
                 <div class="item">
-                    <img src="images/falloutnv.jpg" alt="Fifth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/falloutnv.jpg" alt="Fifth slide">
                 </div>
                 <div class="item">
-                    <img src="images/reason.jpg" alt="Sixth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/reason.jpg" alt="Sixth slide">
                 </div>
                 <div class="item">
-                    <img src="images/skyrim_specialed.jpg" alt="Seventh slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/skyrim_specialed.jpg" alt="Seventh slide">
                 </div>
                 <div class="item">
-                    <img src="images/goggalaxy.jpg" alt="Eighth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/goggalaxy.jpg" alt="Eighth slide">
                 </div>
                 <div class="item">
-                    <img src="images/wizard101.jpg" alt="Ninth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/wizard101.jpg" alt="Ninth slide">
                 </div>
                 <div class="item">
-                    <img src="images/matlab.jpg" alt="Tenth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/matlab.jpg" alt="Tenth slide">
                 </div>
                 <div class="item">
-                    <img src="images/sims3.jpg" alt="Eleventh slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/sims3.jpg" alt="Eleventh slide">
                 </div>
                 <div class="item">
-                    <img src="images/metatrader5.jpg" alt="Twelfth slide">
+                    <img src="https://dl.winehq.org/share/images/screenshots/metatrader5.jpg" alt="Twelfth slide">
                 </div>
-            </div>   
+            </div>
             <a class="left carousel-control" href="#carouselScreenshots" data-slide="prev">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 <span class="sr-only">Previous</span>
