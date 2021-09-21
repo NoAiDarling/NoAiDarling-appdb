@@ -316,24 +316,6 @@ class screenshot
         return array();
     }
 
-    function get_screenshot_height()
-    {
-        $this->load_image(false);
-        return $this->oScreenshotImage->get_height();
-    }
-
-    function get_thumbnail_width()
-    {
-        $this->load_image(true);
-        return $this->oThumbnailImage->get_width();
-    }
-
-    function get_thumbnail_height()
-    {
-        $this->load_image(true);
-        return $this->oThumbnailImage->get_height();
-    }
-
     function objectGetSubmitterId()
     {
         return $this->iSubmitterId;
@@ -577,16 +559,13 @@ class screenshot
 
     function get_thumbnail_img()
     {
-        $sImgUrl = apidb_fullurl("appimage.php").'?iId='.$this->iScreenshotId;
-        $sImgWidth = $this->get_thumbnail_width();
-        $sImgHeight = $this->get_thumbnail_height();
-        if (!$sImgWidth)
-            $sImgWidth = '130';
-        if (!$sImgHeight)
-            $sImgHeight = '100';
+        if (defined("APPDB_SCREENSHOT_URL") and !empty(APPDB_SCREENSHOT_URL))
+            $url = APPDB_SCREENSHOT_URL;
+        else
+            $url = APPDB_ROOT."data/";
         $this->sDescription = preg_replace('/\n/', '', $this->sDescription);
-        return "<div class=\"whq-shot\"><img src=\"{$sImgUrl}&amp;bThumbnail=true\" style=\"width:{$sImgWidth}px;height:{$sImgHeight}px;\" ".
-               "alt=\"{$this->sDescription}\" data-shot=\"{$sImgUrl}\"><i class=\"fa fa-search-plus\"></i></div>\n";
+        return "<div class=\"whq-shot\"><img src=\"".APPDB_SCREENSHOT_URL."thumbnails/".$this->iScreenshotId."\" style=\"width:130px;\" ".
+               "alt=\"{$this->sDescription}\" data-shot=\"".APPDB_SCREENSHOT_URL.$this->iScreenshotId."\"><i class=\"fa fa-search-plus\"></i></div>\n";
     }
 
     public static function objectGetItemsPerPage($sState = 'accepted')

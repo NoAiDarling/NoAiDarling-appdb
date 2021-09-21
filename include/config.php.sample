@@ -18,6 +18,7 @@ define("APPDB_OWNER","WineHQ"); // with what product/company is this AppDB relat
 define("APPDB_OWNER_URL","https://www.winehq.org/"); // website of this product/company
 define("APPDB_OWNER_EMAIL","appdb@winehq.org"); // e-mail of this product/company
 define("APPDB_SENDER_EMAIL","appdb-noreply@winehq.org"); // The e-mail address which appears as the sender in mails sent by the AppDB
+define("APPDB_SCREENSHOT_URL","https://dl.winehq.org/winehq/appdb/"); // CDN URL of WineHQ appdb images, leave empty to use local
 define("BUGZILLA_ROOT","https://bugs.winehq.org/"); // path to bugzilla
 
 // Google reCaptcha Secret Key - required on account creations
