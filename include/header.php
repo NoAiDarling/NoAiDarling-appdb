@@ -71,11 +71,13 @@ if (!empty($sHeaderCode))
 <?php
 
 // Display Status Messages
-$GLOBALS['session']->dumpmsgbuffer();
-if (is_array($GLOBALS['session']->msg) and count($GLOBALS['session']->msg) > 0)
+global $session;
+$session->dumpmsgbuffer();
+
+if (is_array($session->msg) and count($session->msg) > 0)
 {
     echo "<div id=\"whq-alert\">\n";
-    foreach ($GLOBALS['session']->msg as $msg)
+    foreach ($session->msg as $msg)
     {
         if (empty($msg))
             continue;
