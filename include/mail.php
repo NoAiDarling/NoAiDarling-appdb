@@ -1,6 +1,10 @@
 <?php
 require_once(BASE."include/config.php");
 
+require_once('PEAR.php');
+require_once('Mail.php');
+require_once('Mail/mime.php');
+
 function mail_appdb($sEmailList,$sSubject,$sMsg)
 {
     // NOTE: For AppDB developers: If email is disabled return from this function
@@ -8,14 +12,15 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
     if(defined("DISABLE_EMAIL"))
         return;
 
-    $sEmailListComma = str_replace(" ",",",$sEmailList);
+    // make email list
+    $aEmailList = explode(" ",$sEmailList);
+    if (empty($aEmailList))
+    {
+        addmsg("Error while sending e-mail", "red");
+        return false;
+    }
 
-    $sHeaders  = "MIME-Version: 1.0\r\n";
-    $sHeaders .= "From: AppDB <".APPDB_SENDER_EMAIL.">\r\n";
-    $sHeaders .= "Reply-to: AppDB <".APPDB_SENDER_EMAIL.">\r\n";
-    $sHeaders .= "Bcc: $sEmailListComma\r\n";
-    $sHeaders .= "X-Priority: 3\r\n";
-    $sHeaders .= "X-Mailer: ".APPDB_OWNER." mailer\r\n";
+    // Build message body
     $sMsg  = trim(str_replace("\r\n","\n",$sMsg));
     $sMsg  = $sSubject."\n-------------------------------------------------------\n".$sMsg."\n\n";
     $sMsg .= "Best regards.\n";
@@ -36,9 +41,58 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
         return;
     }
 
-    $sMsg = html_entity_decode($sMsg);
-    $bResult = mail(APPDB_SENDER_EMAIL, "[AppDB] ".$sSubject, $sMsg, $sHeaders,
-                    "-f".APPDB_SENDER_EMAIL);
+    if (!class_exists('Mail') or !class_exists('Mail_mime'))
+        trigger_error("Mail libs not installed!", E_USER_ERROR);
+
+    $mime = new Mail_mime(array(
+        'head_charset' => 'utf-8',
+        "text_charset" => "utf-8",
+        "html_charset" => "utf-8",
+        "eol"          => "\n"
+    ));
+    $opts = array(
+        'host'     => APPDB_MAIL_HOST,
+        'port'     => APPDB_MAIL_PORT
+    );
+    if (defined(APPDB_MAIL_USER) and !empty(APPDB_MAIL_USER) and !empty(APPDB_MAIL_PASS)) {
+        $opts['auth'] = true;
+        $opts['username'] = APPDB_MAIL_USER;
+        $opts['password'] = APPDB_MAIL_PASS;
+        $opts['timeout'] = '5';
+    }
+
+    $bResult = true;
+    try {
+        $mail = Mail::factory('smtp', $opts);
+        $headers = array(
+            'To' => join(", ", $aEmailList),
+            'From' => APPDB_SENDER_EMAIL,
+            'Reply-To' => APPDB_SENDER_EMAIL,
+            'Subject' => $sSubject,
+            'X-Mailer' => APPDB_OWNER." mailer"
+        );
+        foreach ($headers as $name => $value)
+        {
+            $headers[$name] = $mime->encodeHeader($name, $value, "utf-8", "quoted-printable");
+        }
+        $to = array();
+        foreach ($aEmailList as $sEmailItem)
+        {
+            $to[] = $mime->encodeHeader("to", $sEmailItem, "utf-8", "quoted-printable");
+        }
+        $sMsg = $mime->setTXTBody($sMsg);
+        $sMsg = $mime->get();
+        $ret = $mail->send($to, $headers, $sMsg);
+        if (PEAR::isError($ret))
+        {
+            $errMsg = $ret->getMessage();
+            addmsg($ret->getMessage(), "red");
+            return false;
+        }
+    } catch (Exception $e) {
+        $bResult = false;
+    }
+
     if($bResult)
         addmsg("E-mail sent", "green");
     else 

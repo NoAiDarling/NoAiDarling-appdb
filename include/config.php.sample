@@ -18,7 +18,7 @@ define("APPDB_OWNER","WineHQ"); // with what product/company is this AppDB relat
 define("APPDB_OWNER_URL","https://www.winehq.org/"); // website of this product/company
 define("APPDB_OWNER_EMAIL","appdb@winehq.org"); // e-mail of this product/company
 define("APPDB_SENDER_EMAIL","appdb-noreply@winehq.org"); // The e-mail address which appears as the sender in mails sent by the AppDB
-define("APPDB_SCREENSHOT_URL","https://dl.winehq.org/winehq/appdb/"); // CDN URL of WineHQ appdb images, leave empty to use local
+define("APPDB_SCREENSHOT_URL",""); // CDN URL of WineHQ appdb images, leave empty to use local
 define("BUGZILLA_ROOT","https://bugs.winehq.org/"); // path to bugzilla
 
 // Google reCaptcha Secret Key - required on account creations
@@ -34,6 +34,12 @@ define("RECAPTCHA_SECRET","");
 // DISABLE_EMAIL is set
 //if(!defined("PRINT_EMAIL"))
 // define("PRINT_EMAIL", true); // print email, see mail_appdb() in include/mail.php
+
+// Mail SMTP config (used in: inclide/mail.php)
+define("APPDB_MAIL_HOST", "localhost");
+define("APPDB_MAIL_PORT", 25);
+//define("APPDB_MAIL_USER", "");
+//define("APPDB_MAIL_PASS", "");
 
 // How old (days) a test report has to before it is judged to be aged
 define("TESTDATA_AGED_THRESHOLD", 175);
