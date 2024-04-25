@@ -12,16 +12,19 @@ define('iNotificationIntervalDays', 2); // days between each notification level
 // class that can retrieve the queued entries for a given maintainer instance
 class queuedEntries
 {
-  var $aVersionIds;
-  var $aScreenshotIds;
-  var $aTestDataIds;
+  public $aVersionIds;
+  public $aScreenshotIds;
+  public $aTestDataIds;
 
-  var $oMaintainer; // the maintainer we are retrieving entries for
+  public $oMaintainer; // the maintainer we are retrieving entries for
 
-  function queuedEntries($oMaintainer)
+  function __construct ($oMaintainer)
+  {
+    $this->queuedEntries($oMaintainer);
+  }
+  public function queuedEntries($oMaintainer)
   {
     $this->oMaintainer = $oMaintainer;
-
     $this->aVersionIds = array();
     $this->aScreenshotIds = array();
     $this->aTestDataIds = array();
@@ -132,13 +135,17 @@ class queuedEntries
 // can act on these results
 class notificationUpdate
 {
-  var $sEmail;
-  var $sSubject;
-  var $sMsg; // contents of the email we will send to the maintainer
-  var $iTargetLevel; // the target notification level based upon the
+  public $sEmail;
+  public $sSubject;
+  public $sMsg; // contents of the email we will send to the maintainer
+  public $iTargetLevel; // the target notification level based upon the
                      // maintiners queued entries
 
-  function notificationUpdate($sEmail, $sSubject, $sMsg, $iTargetLevel)
+  function __construct($sEmail, $sSubject, $sMsg, $iTargetLevel)
+  {
+    $this->notificationUpdate($sEmail, $sSubject, $sMsg, $iTargetLevel);
+  }
+  public function notificationUpdate($sEmail, $sSubject, $sMsg, $iTargetLevel)
   {
     $this->sEmail = $sEmail;
     $this->sSubject = $sSubject;
@@ -150,22 +157,26 @@ class notificationUpdate
 
 class maintainer
 {
-    var $iMaintainerId;
-    var $iAppId;
-    var $iVersionId;
-    var $iUserId;
-    var $sMaintainReason;
-    var $bSuperMaintainer;
-    var $aSubmitTime; //FIXME: should be 'sSubmitTime'
-    var $sState;
-    var $sReplyText;
+    public $iMaintainerId;
+    public $iAppId;
+    public $iVersionId;
+    public $iUserId;
+    public $sMaintainReason;
+    public $bSuperMaintainer;
+    public $aSubmitTime; //FIXME: should be 'sSubmitTime'
+    public $sState;
+    public $sReplyText;
 
     // parameters used in the queued data notification system
     // that lets maintainers know that their applications/versions have
     // queued data for them to process
-    var $iNotificationLevel; // the current warning level of this maintainer
-    var $sNotificationTime; // the time when we last warned this maintainer
+    public $iNotificationLevel; // the current warning level of this maintainer
+    public $sNotificationTime; // the time when we last warned this maintainer
 
+    function __construct($iMaintainerId = null, $oRow = null)
+    {
+        return $this->maintainer($iMaintainerId, $oRow);
+    }
     function maintainer($iMaintainerId = null, $oRow = null)
     {
         // set a default notification level of 0
@@ -1484,9 +1495,6 @@ class maintainer
       $sQuery = "update appMaintainers set notificationLevel = '?', notificationTime = ?".
         " where maintainerId = '?'";
       query_parameters($sQuery, $this->iNotificationLevel, "NOW()", $this->iMaintainerId);
-
-      //TODO: we probably want to copy the mailing list on each of these emails
-      $oNotificationUpdate->sEmail.=" cmorgan@alum.wpi.edu"; // FIXME: for debug append my email address
 
       // we don't send any emails if the notification level is zero
       if($this->iNotificationLevel == 0)
