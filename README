@@ -3,6 +3,12 @@
 Maintainer:
     Jeremy Newman <jnewman@codeweavers.com>
 
+Requirements:
+ * PHP 7.4 or higher
+ * MySQL (or MariaDB)
+ * PHP-Mail
+ * PHP-Mail-Mime
+
 ## To install locally for testing/hacking:
 
 1. Copy AppDB files to somewhere where your web server can access them.
