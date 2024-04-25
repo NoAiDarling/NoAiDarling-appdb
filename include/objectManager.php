@@ -26,6 +26,22 @@ class ObjectManager
                          where we first run the object's getOutputEditorValues()
                          and then objectManager's delete_entry(). */
 
+    function __construct ($sClass, $sTitle = "list", $iId = false)
+    {
+        $this->ObjectManager($sClass, $sTitle, $iId);
+    }
+
+    function ObjectManager($sClass, $sTitle = "list", $iId = false)
+    {
+        $this->sClass = $sClass;
+        $this->sTitle = $sTitle;
+        $this->iId = $iId;
+        $this->oMultiPage = new MultiPage(FALSE);
+        $this->oTableRow = new OMTableRow(null);
+        $this->sState = 'accepted';
+        $this->oFilters = null; // We only fill this when needed, as it can be quite slow
+    }
+
     /* Remove the cached object of the class we are working with, useful in cases where we
        modify the object in such a way that it needs to be reloaded */
     private function flushCachedObject()
@@ -125,17 +141,6 @@ class ObjectManager
     public function getMultiPageDataFromInput($aClean)
     {
       $this->oMultiPage->getDataFromInput($aClean);
-    }
-
-    function ObjectManager($sClass, $sTitle = "list", $iId = false)
-    {
-        $this->sClass = $sClass;
-        $this->sTitle = $sTitle;
-        $this->iId = $iId;
-        $this->oMultiPage = new MultiPage(FALSE);
-        $this->oTableRow = new OMTableRow(null);
-        $this->sState = 'accepted';
-        $this->oFilters = null; // We only fill this when needed, as it can be quite slow
     }
 
     /* Check whether the associated class has the given method */
@@ -735,17 +740,15 @@ class ObjectManager
             /* Should we mail the submitter? */
             if($iSubmitterId && $iSubmitterId != $_SESSION['current']->iUserId)
             {
-                return new mail($oObject->objectGetMail($sAction, $bMailSubmitter,
-                                                        $bParentAction),
-                                $iSubmitterId);
-            } else
+                return new appdb_mail($oObject->objectGetMail($sAction, $bMailSubmitter,$bParentAction),$iSubmitterId);
+            }
+            else
             {
                 return null;
             }
         } else
         {
-            return new mail($oObject->objectGetMail("delete", $bMailSubmitter,
-                                                    $bParentAction));
+            return new appdb_mail($oObject->objectGetMail("delete", $bMailSubmitter,$bParentAction));
         }
     }
 
@@ -1815,7 +1818,12 @@ class MultiPage
     var $iPage;
     var $bEnabled;
 
-    function MultiPage($bEnabled = FALSE, $iItemsPerPage = 0, $iLowerLimit = 0)
+    function __construct ($bEnabled = FALSE, $iItemsPerPage = 0, $iLowerLimit = 0)
+    {
+        $this->MultiPage($bEnabled, $iItemsPerPage, $iLowerLimit);
+    }
+
+    public function MultiPage($bEnabled = FALSE, $iItemsPerPage = 0, $iLowerLimit = 0)
     {
         $this->bEnabled = $bEnabled;
         $this->iItemsPerPage = $iItemsPerPage;
@@ -1841,22 +1849,32 @@ class MultiPage
 
 class mailOptions
 {
-    var $bMailOnce;
+    public $bMailOnce;
 
-    function mailOptions()
+    function __construct ()
+    {
+        $this->mailOptions();
+    }
+
+    public function mailOptions()
     {
         /* Set default options */
         $this->bMailOnce = FALSE;
     }
 }
 
-class mail
+class appdb_mail
 {
     var $sSubject;
     var $sMessage;
     var $sRecipients;
 
-    function mail($aInput, $iRecipientId = null)
+    function __construct ($aInput, $iRecipientId = null)
+    {
+        $this->mail($aInput, $iRecipientId);
+    }
+
+    public function mail($aInput, $iRecipientId = null)
     {
         if(!$aInput)
             return;
