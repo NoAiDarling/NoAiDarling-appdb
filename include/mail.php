@@ -14,6 +14,8 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
 
     // make email list
     $aEmailList = explode(" ",$sEmailList);
+    $aEmailList = array_map('strtolower', $aEmailList);
+    $aEmailList = array_unique($aEmailList);
     if (empty($aEmailList))
     {
         addmsg("Error while sending e-mail", "red");
@@ -61,11 +63,15 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
         $opts['timeout'] = '5';
     }
 
-    $bResult = true;
-    try {
+    $sMsg = $mime->setTXTBody($sMsg);
+    $sMsg = $mime->get();
+
+    $bEmailFail = 0;
+    foreach ($aEmailList as $sEmailItem)
+    {
         $mail = Mail::factory('smtp', $opts);
         $headers = array(
-            'To' => join(", ", $aEmailList),
+            'To' => $sEmailItem,
             'From' => APPDB_SENDER_EMAIL,
             'Reply-To' => APPDB_SENDER_EMAIL,
             'Subject' => $sSubject,
@@ -75,28 +81,23 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
         {
             $headers[$name] = $mime->encodeHeader($name, $value, "utf-8", "quoted-printable");
         }
-        $to = array();
-        foreach ($aEmailList as $sEmailItem)
-        {
-            $to[] = $mime->encodeHeader("to", $sEmailItem, "utf-8", "quoted-printable");
-        }
-        $sMsg = $mime->setTXTBody($sMsg);
-        $sMsg = $mime->get();
+        $to = $mime->encodeHeader("to", $sEmailItem, "utf-8", "quoted-printable");
         $ret = $mail->send($to, $headers, $sMsg);
         if (PEAR::isError($ret))
         {
-            $errMsg = $ret->getMessage();
-            addmsg($ret->getMessage(), "red");
-            return false;
+            // FIXME: need to log email errors somewhere
+            //$errMsg = $ret->getMessage();
+            $bEmailFail++;
         }
-    } catch (Exception $e) {
-        $bResult = false;
+        unset($mail, $headers, $to, $ret);
     }
 
-    if($bResult)
-        addmsg("E-mail sent", "green");
-    else 
+    /* we are only going to display a failure, when the number of errors matches
+     the number of emails sent */
+    if ($bEmailFail and $bEmailFail == count($aEmailList))
         addmsg("Error while sending e-mail", "red");
-    return $bResult;
+    else
+        addmsg("E-mail sent", "green");
+    return true;
 }
 ?>
