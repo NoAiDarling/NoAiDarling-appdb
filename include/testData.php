@@ -81,36 +81,32 @@ class testData{
         else
             $this->sState = $this->mustBeQueued() ? 'queued' : 'accepted';
 
-        $hResult = query_parameters("INSERT INTO testResults (versionId, whatWorks, whatDoesnt,".
-                                        "whatNotTested, testedDate, distributionId,".
-                                        "testedRelease, staging, installs, runs,".
-                                        "usedWorkaround, workarounds,".
-                                        "testedRating, comments,".
-                                        "submitTime, submitterId, state,".
-                                        "gpuMfr, graphicsDriver, hasProblems)".
-                                        "VALUES('?', '?', '?', '?', '?', '?', '?',".
-                                        "'?', '?', '?', '?', '?',".
-                                        "'?', '?', '?', '?', '?', '?', '?', '?')",
-                                    $this->iVersionId, 
-                                    $this->shWhatWorks,
-                                    $this->shWhatDoesnt,
-                                    $this->shWhatNotTested, 
-                                    $this->sTestedDate,
-                                    $this->iDistributionId,
-                                    $this->sTestedRelease, 
-                                    $this->iStaging, 
-                                    $this->sInstalls,
-                                    $this->sRuns,
-                                    $this->sUsedWorkaround,
-                                    $this->shWorkarounds,
-                                    $this->sTestedRating, 
-                                    $this->shComments,
-                                    date("Y-m-d H:i:s"),
-                                    $_SESSION['current']->iUserId,
-                                    $this->sState,
-                                    $this->sGpuMfr,
-                                    $this->sGraphicsDriver,
-                                    $this->sHasProblems);
+        $hResult = query_parameters("INSERT INTO testResults (versionId, whatWorks, whatDoesnt, ".
+            "whatNotTested, testedDate, distributionId, testedRelease, staging, installs, runs, ".
+            "usedWorkaround, workarounds, testedRating, comments, ".
+            "submitTime, submitterId, state, gpuMfr, graphicsDriver, hasProblems)".
+            "VALUES('?', '?', '?', '?', '?', '?', '?','?', '?', '?', '?', '?', ".
+            "'?', '?', '?', '?', '?', '?', '?', '?')",
+            $this->iVersionId,
+            $this->shWhatWorks,
+            $this->shWhatDoesnt,
+            $this->shWhatNotTested,
+            $this->sTestedDate,
+            $this->iDistributionId,
+            $this->sTestedRelease,
+            $this->iStaging,
+            $this->sInstalls,
+            $this->sRuns,
+            ($this->sUsedWorkaround == 'Yes' ? 'Yes' : 'No'),
+            $this->shWorkarounds,
+            $this->sTestedRating,
+            $this->shComments,
+            date("Y-m-d H:i:s"),
+            $_SESSION['current']->iUserId,
+            $this->sState,
+            $this->sGpuMfr,
+            $this->sGraphicsDriver,
+            $this->sHasProblems);
 
         if($hResult)
         {
