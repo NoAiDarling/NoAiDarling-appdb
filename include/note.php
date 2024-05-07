@@ -17,13 +17,13 @@ define('APPNOTE_SHOW_FOR_SPECIFIC_VERSIONS', -4);
  * Note class for handling notes
  */
 class Note {
-    var $iNoteId;
-    var $iVersionId;
-    var $iAppId;
-    var $sTitle;
-    var $shDescription;
-    var $iSubmitterId;
-    var $sSubmitTime;
+    public $iNoteId;
+    public $iVersionId;
+    public $iAppId;
+    public $sTitle;
+    public $shDescription;
+    public $iSubmitterId;
+    public $sSubmitTime;
     private $aVersions;
     protected $sType;
 
@@ -31,7 +31,11 @@ class Note {
      * Constructor.
      * If $iNoteId is provided, fetches note.
      */
-    function Note($iNoteId = null, $oRow = null)
+    function __construct ($iNoteId = null, $oRow = null)
+    {
+        $this->Note($iNoteId, $oRow);
+    }
+    public function Note($iNoteId = null, $oRow = null)
     {
         $this->aVersions = array();
 
@@ -64,16 +68,16 @@ class Note {
      * Informs interested people about the creation.
      * Returns true on success, false on failure
      */
-    function create()
+    public function create()
     {
         $hResult = query_parameters("INSERT INTO appNotes (versionId, ".
-                                    "appId, noteTitle, noteDesc, submitterId, ".
-                                    "submitTime,type) ".
-                                    "VALUES('?', '?', '?', '?', '?', ?, '?')",
-                                    $this->iVersionId, $this->iAppId,
-                                    $this->sTitle, $this->shDescription,
-                                    $_SESSION['current']->iUserId,
-                                    "NOW()", $this->sType);
+            "appId, noteTitle, noteDesc, submitterId, ".
+            "submitTime, linkedWith, type) ".
+            "VALUES('?', '?', '?', '?', '?', '?', '?', '?')",
+            $this->iVersionId, $this->iAppId,
+            $this->sTitle, $this->shDescription,
+            $_SESSION['current']->iUserId,
+            "NOW()", null, $this->sType);
 
         if($hResult)
         {
@@ -97,7 +101,7 @@ class Note {
     }
 
 
-    function unQueue()
+    public function unQueue()
     {
         return true; // We don't queue notes
     }
@@ -106,7 +110,7 @@ class Note {
      * Update note.
      * Returns true on success and false on failure.
      */
-    function update()
+    public function update()
     {
         $sWhatChanged = "";
         
@@ -170,7 +174,7 @@ class Note {
         return true;
     }
 
-    function purge()
+    public function purge()
     {
         return $this->delete();
     }
@@ -181,7 +185,7 @@ class Note {
      *
      * Returns: true if successful, false if not
      */
-    function delete()
+    public function delete()
     {
         $hResult = query_parameters("DELETE FROM appNotes WHERE noteId = '?'", $this->iNoteId);
 
@@ -194,12 +198,12 @@ class Note {
         return TRUE;
     }
 
-    function objectShowPreview()
+    public function objectShowPreview()
     {
         return TRUE;
     }
 
-    function SendNotificationMail($sAction="add",$sMsg=null)
+    public function SendNotificationMail($sAction="add",$sMsg=null)
     {
         if(!$this->iAppId)
         {
@@ -254,7 +258,7 @@ class Note {
     /* Show note */
     /* $bDisplayOnly means we should not display any editing controls, even if */
     /*   the user has the ability to edit this note */
-    function display($aVars = null)
+    public function display($aVars = null)
     {
         switch($this->sType)
         {
@@ -337,7 +341,7 @@ class Note {
         }
     }
 
-    function objectGetCustomVars($sAction)
+    public function objectGetCustomVars($sAction)
     {
         switch($sAction)
         {
@@ -362,7 +366,7 @@ class Note {
         return note::isRealVersionId($this->iVersionId);
     }
 
-    function outputEditor($aValues = null)
+    public function outputEditor($aValues = null)
     {
         if($aValues)
         {
@@ -440,7 +444,7 @@ class Note {
 
     /* retrieves values from $aValue that were output by outputEditor() */
     /* $aValues can be $_REQUEST or any array with the values from outputEditor() */
-    function GetOutputEditorValues($aValues)
+    public function GetOutputEditorValues($aValues)
     {
         $this->iVersionId = getInput('iVersionId', $aValues);
 
@@ -461,18 +465,18 @@ class Note {
         $this->sType = in_array($aValues['sType'], array('howto','note','warning')) ? $aValues['sType'] : 'note';
     }
 
-    function allowAnonymousSubmissions()
+    public function allowAnonymousSubmissions()
     {
         return false;
     }
 
     // NOTE: notes cannot be queued at this point
-    function mustBeQueued()
+    public function mustBeQueued()
     {
         return false;
     }
 
-    function objectGetId()
+    public function objectGetId()
     {
         return $this->iNoteId;
     }
@@ -481,14 +485,14 @@ class Note {
     //       do not support queuing at this point
     // TODO: we have no permissions scope on retrieving entries
     //       as notes are typically only added to unqueued versions
-    function objectGetEntries($sState, $iRows = 0, $iStart = 0, $sOrderBy = '', $bAscending = true)
+    public function objectGetEntries($sState, $iRows = 0, $iStart = 0, $sOrderBy = '', $bAscending = true)
     {
         $sQuery = "select * from appNotes";
         $hResult = query_parameters($sQuery);
         return $hResult;
     }
 
-    function objectGetEntriesCount($sState)
+    public function objectGetEntriesCount($sState)
     {
         $sQuery = "SELECT COUNT(DISTINCT noteId) as count FROM appNotes";
         $hResult = query_parameters($sQuery);
@@ -506,34 +510,34 @@ class Note {
     //      since the note contents could be very long we would only
     //      want to show a small amount of the text. Implement this
     //      routine when we need it
-    function objectGetHeader()
+    public function objectGetHeader()
     {
         return null;
     }
 
     //TODO: implement this when we implement objectGetHeader()
-    function objectGetTableRow()
+    public function objectGetTableRow()
     {
         return null;
     }
 
-    function objectMakeUrl()
+    public function objectMakeUrl()
     {
         $oManager = new objectManager("note", "View Note");
         return $oManager->makeUrl("view", $this->objectGetId());
     }
 
-    function objectGetSubmitterId()
+    public function objectGetSubmitterId()
     {
         return $this->iSubmitterId;
     }
 
-    function objectGetMailOptions($sAction, $bMailSubmitter, $bParentAction)
+    public function objectGetMailOptions($sAction, $bMailSubmitter, $bParentAction)
     {
         return new mailOptions();
     }
 
-    function objectGetMail($sAction, $bMailSubmitter, $bParentAction)
+    public function objectGetMail($sAction, $bMailSubmitter, $bParentAction)
     {
         /* We don't do this at the moment */
                 return array(null, null, null);
@@ -555,20 +559,20 @@ class Note {
             $this->iAppId = $iNewId;
     }
 
-    function objectGetChildren($bIncludeDeleted = false)
+    public function objectGetChildren($bIncludeDeleted = false)
     {
         return array();
     }
 
     //TODO: not sure if we want to use sTitle here or what
-    function objectMakeLink()
+    public function objectMakeLink()
     {
         $sLink = "<a href=\"".$this->objectMakeUrl()."\">".
                  $this->sTitle."</a>";
         return $sLink;
     }
 
-    function objectGetState()
+    public function objectGetState()
     {
         return 'accepted'; // We don't queue notes
     }
@@ -577,7 +581,7 @@ class Note {
     //  - have "admin" privileges
     //  - maintain the version, or supermaintain the application that
     //    this version is under
-    function canEdit()
+    public function canEdit()
     {
         if($_SESSION['current']->hasPriv("admin"))
             return true;
