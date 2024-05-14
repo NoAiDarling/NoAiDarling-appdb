@@ -1141,16 +1141,16 @@ class testData{
     function make_Installs_list($sVarname, $sSelectedValue)
     {
         echo "<select name='$sVarname' class='form-control form-control-inline'>\n";
-        echo "<option value=\"\">Choose ...</option>\n";
+        echo "<option value=\"N/A\">Choose ...</option>\n";
         $aRating = array('Yes', 'No', 'No, but has workaround', 'N/A');
         $iMax = count($aRating);
 
         for($i=0; $i < $iMax; $i++)
         {
             if($aRating[$i] == $sSelectedValue)
-                echo "<option value='".$aRating[$i]."' selected>".$aRating[$i]."\n";
+                echo "<option value='".$aRating[$i]."' selected>".$aRating[$i]."</option>\n";
             else
-                echo "<option value='".$aRating[$i]."'>".$aRating[$i]."\n";
+                echo "<option value='".$aRating[$i]."'>".$aRating[$i]."</option>\n";
         }
         echo "</select>\n";
     }
@@ -1158,16 +1158,16 @@ class testData{
     function make_Runs_list($sVarname, $sSelectedValue)
     {
         echo "<select name='$sVarname' class='form-control form-control-inline'>\n";
-        echo "<option value=\"\">Choose ...</option>\n";
+        echo "<option value=\"Not installable\">Choose ...</option>\n";
         $aRating = array("Yes", "No", "Not installable");
         $iMax = count($aRating);
 
         for($i=0; $i < $iMax; $i++)
         {
             if($aRating[$i] == $sSelectedValue)
-                echo "<option value='".$aRating[$i]."' selected>".$aRating[$i]."\n";
+                echo "<option value='".$aRating[$i]."' selected>".$aRating[$i]."</option>\n";
             else
-                echo "<option value='".$aRating[$i]."'>".$aRating[$i]."\n";
+                echo "<option value='".$aRating[$i]."'>".$aRating[$i]."</option>\n";
         }
         echo "</select>\n";
     }
@@ -1175,16 +1175,16 @@ class testData{
     function make_gpuMfr_list($sVarname, $sSelectedValue)
     {
         echo "<select name='$sVarname'class='form-control form-control-inline'>\n";
-        echo "<option value=\"\">GPU manufacturer?</option>\n";
+        echo "<option value=\"Unknown\">GPU manufacturer?</option>\n";
         $aGpuMfr = array('AMD', 'Intel', 'Nvidia', 'Other', 'Unknown');
         $iMax = count($aGpuMfr);
         
         for($i=0; $i < $iMax; $i++)
         {
             if($aGpuMfr[$i] == $sSelectedValue)
-                echo "<option value='".$aGpuMfr[$i]."' selected>".$aGpuMfr[$i]."\n";
+                echo "<option value='".$aGpuMfr[$i]."' selected>".$aGpuMfr[$i]."</option>\n";
             else
-                echo "<option value='".$aGpuMfr[$i]."'>".$aGpuMfr[$i]."\n";
+                echo "<option value='".$aGpuMfr[$i]."'>".$aGpuMfr[$i]."</option>\n";
         }
         echo "</select>\n";
     }
@@ -1193,16 +1193,16 @@ class testData{
     
     {
         echo "<select name='$sVarname' class='form-control form-control-inline'>\n";
-        echo "<option value=\"\">Open source or proprietary driver?</option>\n";
+        echo "<option value=\"unknown\">Open source or proprietary driver?</option>\n";
         $aGraphicsDriver = array('open source', 'proprietary', 'unknown');
         $iMax = count($aGraphicsDriver);
         
         for($i=0; $i < $iMax; $i++)
         {
             if($aGraphicsDriver[$i] == $sSelectedValue)
-                echo "<option value='".$aGraphicsDriver[$i]."' selected>".$aGraphicsDriver[$i]."\n";
+                echo "<option value='".$aGraphicsDriver[$i]."' selected>".$aGraphicsDriver[$i]."</option>\n";
             else
-                echo "<option value='".$aGraphicsDriver[$i]."'>".$aGraphicsDriver[$i]."\n";
+                echo "<option value='".$aGraphicsDriver[$i]."'>".$aGraphicsDriver[$i]."</option>\n";
         }
         echo "</select>\n";
     }
