@@ -121,7 +121,7 @@ create table appData (
 	submitTime      datetime NOT NULL,
 	submitterId     int(11) NOT NULL default '0',
 	state           enum('accepted','queued','rejected') NOT NULL default 'accepted',
-	testedVersion	text NOT NULL,
+	testedVersion	text NOT NULL default '',
 	KEY id (id),
 	KEY versionId (versionId)
 );
