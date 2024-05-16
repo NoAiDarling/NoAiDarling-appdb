@@ -6,18 +6,22 @@ require_once(BASE."include/mail.php");
 require_once(BASE."include/util.php");
 
 // Test class for handling Distributions.
-
-class distribution {
-    var $iDistributionId;
-    var $sName;
-    var $sUrl;
-    var $sSubmitTime;
-    var $iSubmitterId;
+class distribution
+{
+    public $iDistributionId;
+    public $sName;
+    public $sUrl;
+    public $sSubmitTime;
+    public $iSubmitterId;
     private $sState;
-    var $aTestingIds;
+    public $aTestingIds;
 
-     // constructor, fetches the data.
-    function distribution($iDistributionId = null, $oRow = null)
+    // constructor, fetches the data.
+    function __construct ($iDistributionId = null, $oRow = null)
+    {
+        $this->distribution($iDistributionId, $oRow);
+    }
+    public function distribution($iDistributionId = null, $oRow = null)
     {
         $this->aTestingIds = array();
         // we are working on an existing distribution.
@@ -28,9 +32,7 @@ class distribution {
         $this->sName = "Unknown";
         if(!$oRow)
         {
-            $sQuery = "SELECT *
-                        FROM distributions
-                        WHERE distributionId = '?'";
+            $sQuery = "SELECT * FROM distributions WHERE distributionId = '?'";
             if($hResult = query_parameters($sQuery, $iDistributionId))
                 $oRow = query_fetch_object($hResult);
         }
@@ -46,39 +48,21 @@ class distribution {
         }
 
         /*
-            * We fetch Test Result Ids. 
-            */
+         * We fetch Test Result Ids.
+         */
 
         if($_SESSION['current']->hasPriv("admin"))
         {
-            $sQuery = "SELECT testingId
-                            FROM testResults, ?.versions
-                            WHERE
-                            versions.value = testResults.testedRelease
-                            AND
-                            versions.product_id = '?'
-                            AND
-                            distributionId = '?'
-                            ORDER BY testedRating,bugs.versions.id DESC";
-        } else /* only let users view test results that aren't queued and for apps that */
-                /* aren't queued or versions that aren't queued */
+            $sQuery = "SELECT testingId FROM testResults WHERE distributionId = '?' ORDER BY testedRating, INET_ATON(SUBSTRING_INDEX(CONCAT(testResults.testedRelease,'.0.0.0'),'.',4)) DESC";
+        }
+        else
         {
-            $sQuery = "SELECT testingId
-                            FROM testResults, appFamily, appVersion, ?.versions
-                            WHERE testResults.state = 'accepted' AND
-                                versions.value = testResults.testedRelease
-                                AND
-                                versions.product_id = '?'
-                                AND
-                                testResults.versionId = appVersion.versionId AND
-                                appFamily.appId = appVersion.appId AND
-                                appFamily.state = 'accepted' AND
-                                appVersion.state = 'accepted' AND
-                                distributionId = '?'
-                            ORDER BY testedRating,bugs.versions.id DESC";
+            /* only let users view test results that aren't queued and for apps that */
+            /* aren't queued or versions that aren't queued */
+            $sQuery = "SELECT testingId FROM testResults, appFamily, appVersion WHERE testResults.state = 'accepted' AND appFamily.appId = appVersion.appId AND appFamily.state = 'accepted' AND appVersion.state = 'accepted' AND distributionId = '?' ORDER BY INET_ATON(SUBSTRING_INDEX(CONCAT(testResults.testedRelease,'.0.0.0'),'.',4)) DESC";
         }
 
-        if($hResult = query_parameters($sQuery, BUGZILLA_DB, BUGZILLA_PRODUCT_ID, $this->iDistributionId))
+        if($hResult = query_parameters($sQuery, $this->iDistributionId))
         {
             while($oRow = query_fetch_object($hResult))
             {
@@ -88,13 +72,10 @@ class distribution {
     }
 
     // Creates a new distribution.
-    function create()
+    public function create()
     {
         //Let's not create a duplicate 
-        $sQuery = "SELECT *
-                   FROM distributions
-                   WHERE name = '?'
-                   AND state != 'deleted'";
+        $sQuery = "SELECT * FROM distributions WHERE name = '?' AND state != 'deleted'";
         $hResult = query_parameters($sQuery, $this->sName);
 
         if($hResult && $oRow = query_fetch_object($hResult))
@@ -110,13 +91,11 @@ class distribution {
             }
         }
 
-        $hResult = query_parameters("INSERT INTO distributions (name, url, submitTime, ".
-                                    "submitterId, state) ".
-                                    "VALUES ('?', '?', ?, '?', '?')",
-                                    $this->sName, $this->sUrl,
-                                    "NOW()",
-                                    $_SESSION['current']->iUserId,
-                                    $this->mustBeQueued() ? 'queued' : 'accepted');
+        $hResult = query_parameters("INSERT INTO distributions (name, url, submitTime, submitterId, state) VALUES ('?', '?', ?, '?', '?')",
+            $this->sName, $this->sUrl,
+            "NOW()",
+            $_SESSION['current']->iUserId,
+            $this->mustBeQueued() ? 'queued' : 'accepted');
         if($hResult)
         {
             $this->iDistributionId = query_appdb_insert_id();
@@ -131,7 +110,7 @@ class distribution {
     }
 
     // Update Distribution.
-    function update()
+    public function update()
     {
         // is the current user allowed to update this Distribution? 
         if(!$_SESSION['current']->hasPriv("admin") &&
@@ -141,7 +120,7 @@ class distribution {
             return;
         }
         if(query_parameters("UPDATE distributions SET name = '?', url = '?' WHERE distributionId = '?'",
-                            $this->sName, $this->sUrl, $this->iDistributionId))
+            $this->sName, $this->sUrl, $this->iDistributionId))
         {
             return true;
         } else
@@ -152,19 +131,18 @@ class distribution {
     }
 
     // Removes the distribution from the database.
-    function purge()
+    public function purge()
     {
         /* Is the current user allowed to delete this distribution?  We allow
-                everyone to delete a queued, empty distribution, because it should be
-                deleted along with the last testData associated with it */
-                if(!($this->canEdit() || (!sizeof($this->aTestingIds) &&
-                $this->sState != 'accepted')))
-                return false;
+        everyone to delete a queued, empty distribution, because it should be
+        deleted along with the last testData associated with it */
+        if(!($this->canEdit() || (!sizeof($this->aTestingIds) && $this->sState != 'accepted')))
+            return false;
 
         // if the distribution has test results only enable an admin to delete
         // the distribution
-                if(sizeof($this->aTestingIds) && !$_SESSION['current']->hasPriv("admin"))
-                return FALSE;
+        if(sizeof($this->aTestingIds) && !$_SESSION['current']->hasPriv("admin"))
+            return FALSE;
 
         $bSuccess = TRUE;
 
@@ -175,9 +153,7 @@ class distribution {
         }
 
         // now delete the Distribution 
-                $sQuery = "DELETE FROM distributions
-                WHERE distributionId = '?' 
-                LIMIT 1";
+        $sQuery = "DELETE FROM distributions WHERE distributionId = '?' LIMIT 1";
         if(!($hResult = query_parameters($sQuery, $this->iDistributionId)))
             $bSuccess = FALSE;
 
@@ -185,7 +161,7 @@ class distribution {
     }
 
     // Marks distribution as deleted in the database.
-    function delete()
+    public function delete()
     {
         /* admins and maintainers can delete any distribution;
             users can only delete distributions they submitted that are still in their queue */
@@ -197,9 +173,7 @@ class distribution {
         $bSuccess = TRUE;
 
         // now delete the Distribution 
-        $sQuery = "UPDATE distributions SET state = 'deleted'
-                   WHERE distributionId = '?' 
-                   LIMIT 1";
+        $sQuery = "UPDATE distributions SET state = 'deleted' WHERE distributionId = '?' LIMIT 1";
         if(!($hResult = query_parameters($sQuery, $this->iDistributionId)))
             $bSuccess = FALSE;
 
@@ -207,7 +181,7 @@ class distribution {
     }
 
     // Move Distribution out of the queue.
-    function unQueue()
+    public function unQueue()
     {
         /* Check permissions */
         if($this->mustBeQueued())
@@ -217,8 +191,7 @@ class distribution {
         if($this->sState != 'queued')
             return false;
 
-        if(query_parameters("UPDATE distributions SET state = '?' WHERE distributionId = '?'",
-                            'accepted', $this->iDistributionId))
+        if(query_parameters("UPDATE distributions SET state = '?' WHERE distributionId = '?'", 'accepted', $this->iDistributionId))
         {
             $this->sState = 'accepted';
             return true;
@@ -229,7 +202,7 @@ class distribution {
         }
     }
 
-    function Reject($bSilent=false)
+    public function Reject($bSilent=false)
     {
         // is the current user allowed to reject this Distribution? 
         if(!$_SESSION['current']->hasPriv("admin"))
@@ -244,7 +217,7 @@ class distribution {
         return $this->delete();
     }
 
-    function getTestResults($bIncludeDeleted = false)
+    public function getTestResults($bIncludeDeleted = false)
     {
         if($bIncludeDeleted)
             $sExcludeDeleted = "";
@@ -252,7 +225,7 @@ class distribution {
             $sExcludeDeleted = " AND state != 'deleted'";
 
         $aTests = array();
-        $sQuery = "SELECT * FROM testResults WHERE distributionId = '?'$sExcludeDeleted";
+        $sQuery = "SELECT * FROM testResults WHERE distributionId = '?'{$sExcludeDeleted}";
         $hResult = query_parameters($sQuery, $this->iDistributionId);
 
         while($oRow = query_fetch_object($hResult))
@@ -261,7 +234,7 @@ class distribution {
         return $aTests;
     }
 
-    function objectGetChildren($bIncludeDeleted = false)
+    public function objectGetChildren($bIncludeDeleted = false)
     {
         $aChildren = array();
 
@@ -274,7 +247,7 @@ class distribution {
         return $aChildren;
     }
 
-    function ReQueue()
+    public function ReQueue()
     {
         // is the current user allowed to requeue this data 
         if(!$_SESSION['current']->hasPriv("admin") &&
@@ -284,10 +257,10 @@ class distribution {
         }
 
         if(query_parameters("UPDATE testResults SET state = '?' WHERE testingId = '?'",
-                            'queued', $this->iTestingId))
+            'queued', $this->iTestingId))
         {
             if(query_parameters("UPDATE distribution SET state = '?' WHERE distributionId = '?'",
-                                'queued', $this->iDistributionId))
+                'queued', $this->iDistributionId))
             {
                 $this->sState = 'queued';
 
@@ -303,17 +276,17 @@ class distribution {
         return false;
     }
 
-    function objectGetSubmitterId()
+    public function objectGetSubmitterId()
     {
         return $this->iSubmitterId;
     }
 
-    function objectGetMailOptions($sAction, $bMailSubmitter, $bParentAction)
+    public function objectGetMailOptions($sAction, $bMailSubmitter, $bParentAction)
     {
         return new mailOptions();
     }
 
-    function objectGetMail($sAction, $bMailSubmitter, $bParentAction)
+    public function objectGetMail($sAction, $bMailSubmitter, $bParentAction)
     {
         $oSubmitter = new user($this->iSubmitterId);
 
@@ -323,8 +296,7 @@ class distribution {
             {
                 case "delete":
                     $sSubject = "Submitted operating system deleted";
-                    $sMsg = "The operating system you submitted (".$this->sName.") has been ".
-                            "deleted.\n";
+                    $sMsg = "The operating system you submitted (".$this->sName.") has been deleted.\n";
                 break;
             }
             $aMailTo = null;
@@ -333,7 +305,7 @@ class distribution {
             switch($sAction)
             {
                 case "delete":
-                    $sSubject = "Operating system ".$this->sName." deleted";
+                    $sSubject = "Operating system {$this->sName} deleted";
                     $sMsg = "";
                 break;
             }
@@ -343,7 +315,7 @@ class distribution {
         return array($sSubject, $sMsg, $aMailTo);
     }
 
-    function mailSubmitter($sAction="add")
+    public function mailSubmitter($sAction="add")
     {
         global $aClean;
 
@@ -355,13 +327,13 @@ class distribution {
             case "add":
                {
                    $sSubject =  "Submitted operating system accepted";
-                   $sMsg  = "The operating system you submitted (".$this->sName.") has been accepted.\n";
+                   $sMsg  = "The operating system you submitted ({$this->sName}) has been accepted.\n";
                }
             break;
             case "delete":
                 {
                     $sSubject =  "Submitted operating system deleted";
-                    $sMsg  = "The operating system you submitted (".$this->sName.") has been deleted.";
+                    $sMsg  = "The operating system you submitted ({$this->sName}) has been deleted.";
                     $sMsg .= "Reason given:\n";
                     $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
                 }
@@ -373,38 +345,28 @@ class distribution {
         }
     }
 
-    function outputEditor()
+    public function outputEditor()
     {
-        echo "<table width='100%' border=0 cellpadding=2 cellspacing=0>\n";
-
         $this->sName = str_replace('"', '&quot;', $this->sName);
-        // Name
+        echo "<table width='100%' border=0 cellpadding=2 cellspacing=0>\n";
         echo html_tr(array(
-                array("<b>Operating system name:</b>", 'align=right class="color0"'),
-                array('<input type=text name="sDistribution" value="'.$this->sName.
-                        '" size="60" />', 'class="color0"')
-                    ));
-
-        // URL
+            array("<b>Operating system name:</b>", 'align=right class="color0"'),
+            array("<input type=\"text\" name=\"sDistribution\" value=\"{$this->sName}\" size=\"60\" />", 'class="color0"')
+        ));
         echo html_tr(array(
-                array("<b>Operating system URL:</b>", 'align=right class="color0"'),
-                array('<input type=text name="sUrl" value="'.$this->sUrl.
-                        '" size="60" />', 'class="color0"')
-                    ));
-
-
+            array("<b>Operating system URL:</b>", 'align=right class="color0"'),
+            array("<input type=\"text\" name=\"sUrl\" value=\"{$this->sUrl}\" size=\"60\" />", 'class="color0"')
+        ));
         echo "</table>\n";
-
         if($this->iDistributionId)
         {
-            echo  '<input type="hidden" name="iDistributionId" '.
-                    'value="'.$this->iDistributionId.'">',"\n";
+            echo  '<input type="hidden" name="iDistributionId" value="'.$this->iDistributionId.'">',"\n";
         }
     }
 
     /* retrieves values from $_REQUEST that were output by outputEditor() */
     /* $aValues can be $_REQUEST or any array with the values from outputEditor() */
-    function GetOutputEditorValues($aValues)
+    public function GetOutputEditorValues($aValues)
     {
         if($aClean['iDistributionId'])
             $this->iDistributionId = $aValues['iDistributionId'];
@@ -413,12 +375,12 @@ class distribution {
         $this->sUrl = $aValues['sUrl'];
     }
 
-    function objectGetFilterInfo()
+    public function objectGetFilterInfo()
     {
-	$oFilter = new FilterInterface();
+        $oFilter = new FilterInterface();
 
-	$oFilter->AddFilterInfo('name', 'Name', array(FILTER_CONTAINS, FILTER_STARTS_WITH, FILTER_ENDS_WITH), FILTER_VALUES_NORMAL);
-	return $oFilter;
+        $oFilter->AddFilterInfo('name', 'Name', array(FILTER_CONTAINS, FILTER_STARTS_WITH, FILTER_ENDS_WITH), FILTER_VALUES_NORMAL);
+        return $oFilter;
     }
 
     /* Get the total number of Distributions in the database */
@@ -428,14 +390,12 @@ class distribution {
         if($sState == 'rejected')
             return FALSE;
 
-	$sWhereFilter = $oFilter ? $oFilter->getWhereClause() : '';
+        $sWhereFilter = $oFilter ? $oFilter->getWhereClause() : '';
 
-	if($sWhereFilter)
-	    $sWhereFilter = " AND $sWhereFilter";
+        if($sWhereFilter)
+            $sWhereFilter = " AND $sWhereFilter";
 
-        $hResult = query_parameters("SELECT count(distributionId) as num_dists FROM
-                                     distributions WHERE state='?' $sWhereFilter",
-                                    $sState);
+        $hResult = query_parameters("SELECT count(distributionId) as num_dists FROM distributions WHERE state='?' $sWhereFilter", $sState);
 
         if($hResult)
         {
@@ -459,14 +419,14 @@ class distribution {
         while(list($name, $value) = query_fetch_row($hResult))
         {
             if($value == $cvalue)
-                echo "<option value=$value selected>$name\n";
+                echo "<option value=\"$value\" selected>$name</option>\n";
             else
-                echo "<option value=$value>$name\n";
+                echo "<option value=\"$value\">$name</option>\n";
         }
         echo "</select>\n";
     }
 
-    function objectGetHeader()
+    public function objectGetHeader()
     {
         $oTableRow = new TableRowSortable();
 
@@ -507,19 +467,17 @@ class distribution {
         if(!$iRows)
             $iRows = distribution::objectGetEntriesCount($sState, $oFilter);
 
-	$sWhereFilter = $oFilter ? $oFilter->getWhereClause() : '';
+        $sWhereFilter = $oFilter ? $oFilter->getWhereClause() : '';
 
-	if($sWhereFilter)
-	    $sWhereFilter = " AND $sWhereFilter";
+        if($sWhereFilter)
+            $sWhereFilter = " AND $sWhereFilter";
 
-        $sQuery = "SELECT * FROM distributions
-                       WHERE state = '?' $sWhereFilter ORDER BY $sOrderBy $sOrder LIMIT ?,?";
+        $sQuery = "SELECT * FROM distributions WHERE state = '?' $sWhereFilter ORDER BY $sOrderBy $sOrder LIMIT ?,?";
 
-        return query_parameters($sQuery, $sState,
-                                $iStart, $iRows);
+        return query_parameters($sQuery, $sState, $iStart, $iRows);
     }
 
-    function objectGetTableRow()
+    public function objectGetTableRow()
     {
         $oTableRow = new TableRow();
 
@@ -547,7 +505,7 @@ class distribution {
     }
 
     // Whether the user has permission to edit distributions
-    function canEdit()
+    public function canEdit()
     {
         if($_SESSION['current']->hasPriv("admin"))
             return TRUE;
@@ -561,7 +519,7 @@ class distribution {
         return FALSE;
     }
 
-    function mustBeQueued()
+    public function mustBeQueued()
     {
         if($_SESSION['current']->hasPriv("admin") ||
           maintainer::isUserMaintainer($_SESSION['current']))
@@ -570,12 +528,12 @@ class distribution {
             return TRUE;
     }
 
-    function objectHideDelete()
+    public function objectHideDelete()
     {
         return TRUE;
     }
 
-    function display()
+    public function display()
     {
         echo "Operating system name: ";
 
@@ -652,19 +610,19 @@ class distribution {
     }
 
     /* Make a URL for viewing the specified distribution */
-    function objectMakeUrl()
+    public function objectMakeUrl()
     {
         $oObject = new objectManager("distribution", "View Distribution");
         return $oObject->makeUrl("view", $this->iDistributionId);
     }
 
     /* Make an HTML link for viewing the specified distirbution */
-    function objectMakeLink()
+    public function objectMakeLink()
     {
         return "<a href=\"".$this->objectMakeUrl()."\">$this->sName</a>";
     }
 
-    function objectMoveChildren($iNewId)
+    public function objectMoveChildren($iNewId)
     {
         /* Keep track of how many children we modified */
         $iCount = 0;
@@ -682,24 +640,24 @@ class distribution {
         return $iCount;
     }
 
-    function objectGetItemsPerPage($sState = 'accepted')
+    public function objectGetItemsPerPage($sState = 'accepted')
     {
         $aItemsPerPage = array(25, 50, 100, 200);
         $iDefaultPerPage = 25;
         return array($aItemsPerPage, $iDefaultPerPage);
     }
 
-    function objectGetid()
+    public function objectGetid()
     {
         return $this->iDistributionId;
     }
 
-    function allowAnonymousSubmissions()
+    public function allowAnonymousSubmissions()
     {
         return FALSE;
     }
 
-    function objectShowAddEntry()
+    public function objectShowAddEntry()
     {
         return TRUE;
     }
