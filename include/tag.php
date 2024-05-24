@@ -9,7 +9,7 @@ abstract class Tag extends ObjectManagerBase
     protected $sName;
     protected $sDescription;
     
-    function Constructor($iId = null, $oRow = null, $sTextId = '')
+    function __construct($iId = null, $oRow = null, $sTextId = '')
     {
         if($sTextId)
         {

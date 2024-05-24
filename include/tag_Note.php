@@ -83,10 +83,7 @@ class TagNoteVersion extends Tag
 
 class TagNoteVersionAssignMgr extends TagAssignmentMgr
 {
-    function __construct($iId = null, $oRow = null)
-    {
-        $this->Constructor($iId, $oRow);
-    }
+    // The constructor is already set in the parent class.
 
     protected function getTagObject($iId = null, $oRow = null)
     {

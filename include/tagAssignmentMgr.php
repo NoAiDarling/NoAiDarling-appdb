@@ -4,7 +4,7 @@ abstract class TagAssignmentMgr extends ObjectManagerBase
 {
     protected $aTaggedEntries;
 
-    function Constructor($iId = null, $oRow = null)
+    function __construct($iId = null, $oRow = null)
     {
         $this->iId = $iId;
         $this->aTaggedEntries = $this->getTagObject($this->iId)->getTaggedEntries();
