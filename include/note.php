@@ -33,10 +33,6 @@ class Note {
      */
     function __construct ($iNoteId = null, $oRow = null)
     {
-        $this->Note($iNoteId, $oRow);
-    }
-    public function Note($iNoteId = null, $oRow = null)
-    {
         $this->aVersions = array();
 
         if(!$iNoteId && !$oRow)

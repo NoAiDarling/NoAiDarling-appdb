@@ -20,10 +20,6 @@ class queuedEntries
 
   function __construct ($oMaintainer)
   {
-    $this->queuedEntries($oMaintainer);
-  }
-  public function queuedEntries($oMaintainer)
-  {
     $this->oMaintainer = $oMaintainer;
     $this->aVersionIds = array();
     $this->aScreenshotIds = array();
@@ -143,10 +139,6 @@ class notificationUpdate
 
   function __construct($sEmail, $sSubject, $sMsg, $iTargetLevel)
   {
-    $this->notificationUpdate($sEmail, $sSubject, $sMsg, $iTargetLevel);
-  }
-  public function notificationUpdate($sEmail, $sSubject, $sMsg, $iTargetLevel)
-  {
     $this->sEmail = $sEmail;
     $this->sSubject = $sSubject;
     $this->sMsg = $sMsg;
@@ -174,10 +166,6 @@ class maintainer
     public $sNotificationTime; // the time when we last warned this maintainer
 
     function __construct($iMaintainerId = null, $oRow = null)
-    {
-        return $this->maintainer($iMaintainerId, $oRow);
-    }
-    function maintainer($iMaintainerId = null, $oRow = null)
     {
         // set a default notification level of 0
         $this->iNotificationLevel = 0;

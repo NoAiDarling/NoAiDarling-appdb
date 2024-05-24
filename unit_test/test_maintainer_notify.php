@@ -8,26 +8,8 @@ class notifyContainer
 
   var $iVersionId; // the version created by create_version_and_parent_app()
 
-  function __construct($bTestAsMaintainer)
-  {
-    $this->__internal_setupQueuedDataForUser($bTestAsMaintainer);
-  }
-
-  function cleanup()
-  {
-    $this->oTestData->purge();   // deleted the created testData
-    $this->oMaintainer->delete(); // delete the created maintainer entry
-                                  // (Should be deleted when the user is deleted)
-
-    // delete the version and its parent application that we created
-    delete_version_and_parent_app($this->iVersionId);
-
-    // delete the user we created
-    $this->oUser->delete();
-  }
-
   //FIXME: this should be private when we get php5
-  function __internal_setupQueuedDataForUser($bTestAsMaintainer)
+  function __construct($bTestAsMaintainer)
   {
     $bDebugOutputEnabled = false;
 
@@ -153,6 +135,19 @@ class notifyContainer
 
     //    echo "new maintainer class:\n";
     //    print_r($this->oMaintainer);
+  }
+
+  function cleanup()
+  {
+    $this->oTestData->purge();   // deleted the created testData
+    $this->oMaintainer->delete(); // delete the created maintainer entry
+                                  // (Should be deleted when the user is deleted)
+
+    // delete the version and its parent application that we created
+    delete_version_and_parent_app($this->iVersionId);
+
+    // delete the user we created
+    $this->oUser->delete();
   }
 
   // adjust the submission time of the $oTestData object
