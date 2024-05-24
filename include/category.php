@@ -18,7 +18,7 @@ class Category {
     /**
      * constructor, fetches the data.
      */
-    function Category($iCatId = null)
+    function __construct($iCatId = null)
     {
         // we are working on an existing category
         if($iCatId=="0" || $iCatId)

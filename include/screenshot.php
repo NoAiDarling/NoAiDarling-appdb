@@ -34,7 +34,7 @@ class screenshot
     /**    
      * Constructor, fetches the data and image objects if $iScreenshotId is given.
      */
-    function Screenshot($iScreenshotId = null, $oRow = null)
+    function __construct($iScreenshotId = null, $oRow = null)
     {
         // we are working on an existing screenshot
         if(!$iScreenshotId && !$oRow)

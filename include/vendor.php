@@ -16,7 +16,7 @@ class Vendor {
     /**    
      * constructor, fetches the data.
      */
-    function Vendor($iVendorId = null, $oRow = null)
+    function __construct($iVendorId = null, $oRow = null)
     {
         // we are working on an existing vendor
         if(!$iVendorId && !$oRow)

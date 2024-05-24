@@ -26,7 +26,7 @@ class Comment {
      * Constructor.
      * If $iCommentId is provided, fetches comment.
      */
-    function Comment($iCommentId = null, $oRow = null)
+    function __construct($iCommentId = null, $oRow = null)
     {
         if(!$iCommentId && !$oRow)
             return;
