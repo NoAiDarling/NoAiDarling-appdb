@@ -6,32 +6,10 @@ require all granted
 # RedirectMatch   ^.*$    http://appdb.winehq.org/site_outage.html
 
 # Redirects
-RedirectPermanent /help   https://wiki.winehq.org/Category:AppDB
+RedirectPermanent /help   https://gitlab.winehq.org/winehq/appdb/-/wikis/home
 
 # Set Our Default Directory Index
 DirectoryIndex index.php
 
 # 404 not found document
 ErrorDocument 404 https://www.winehq.org/site/404
-
-# Modify the PHP configuration (global vars, etc.)
-php_flag allow_call_time_pass_reference 1
-php_value memory_limit 64M
-php_value error_reporting "7"
-php_value html_errors "1"
-php_value display_errors "1"
-php_value register_globals 0
-php_value short_open_tag 0
-php_value register_long_arrays 0
-php_value magic_quotes_gpc 0
-php_flag zlib.output_compression on
-php_value date.timezone "America/Chicago"
-php_value mail.add_x_header "0"
-
-# make sure gc_probability is non-zero, we want php to take care of
-# session cleanup for us
-php_value session.gc_probability 1
-
-# lower the probability of calling garbage collection
-# the appdb gets so many hits we want to increase the divisor above 100
-php_value session.gc_divisor 2000
