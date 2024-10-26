@@ -16,6 +16,14 @@
  *          displaying a table of objects with the specified queue status otherwise
  */
 
+/* stop a bot flood (JWN) */
+if (preg_match('/\%28SELECT\%2F\%2A/', $_SERVER['REQUEST_URI']))
+{
+    http_response_code(500);
+    exit();
+}
+
+/* load libs */
 require_once('path.php');
 require_once(BASE.'include/incl.php');
 require_once(BASE.'include/objectManager.php');
