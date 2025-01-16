@@ -82,7 +82,7 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
             $headers[$name] = $mime->encodeHeader($name, $value, "utf-8", "quoted-printable");
         }
         $to = $mime->encodeHeader("to", $sEmailItem, "utf-8", "quoted-printable");
-        $ret = $mail->send($to, $headers, $sMsg);
+        $ret = $mail->send($to, array_merge($headers, $mime->headers()), $sMsg);
         if (PEAR::isError($ret))
         {
             // FIXME: need to log email errors somewhere
