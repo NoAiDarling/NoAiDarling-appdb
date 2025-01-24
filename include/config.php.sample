@@ -38,8 +38,8 @@ define("RECAPTCHA_SECRET","");
 // Mail SMTP config (used in: inclide/mail.php)
 define("APPDB_MAIL_HOST", "localhost");
 define("APPDB_MAIL_PORT", 25);
-//define("APPDB_MAIL_USER", "");
-//define("APPDB_MAIL_PASS", "");
+define("APPDB_MAIL_USER", "");
+define("APPDB_MAIL_PASS", "");
 
 // How old (days) a test report has to before it is judged to be aged
 define("TESTDATA_AGED_THRESHOLD", 175);
