@@ -202,7 +202,7 @@ class FilterSet
                 $aFilters[] = $sThisFilter;
         }
 
-        return implode($aFilters, ' AND ');
+        return implode(' AND ', $aFilters);
     }
 
     function getQuery($sTable, $iLimit = 0)
