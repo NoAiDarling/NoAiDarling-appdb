@@ -51,29 +51,27 @@ function appdb_error_shutdown()
  */
 function appdb_error_handler($errno, $errstr, $errfile, $errline, $errcontext = null)
 {
-    global $config;
-
     // debug text
     $debug = "";
 
     // PHP error codes
     $err = array(
-                 1    => 'E_ERROR',
-                 2    => 'E_WARNING',
-                 4    => 'E_PARSE',
-                 8    => 'E_NOTICE',
-                 16   => 'E_CORE_ERROR',
-                 32   => 'E_CORE_WARNING',
-                 64   => 'E_COMPILE_ERROR',
-                 128  => 'E_COMPILE_WARNING',
-                 256  => 'E_USER_ERROR',
-                 512  => 'E_USER_WARNING',
-                 1024 => 'E_USER_NOTICE',
-                 2047 => 'E_ALL',
-                 2048 => 'E_STRICT',
-                 4096 => 'E_RECOVERABLE_ERROR',
-                 8192 => 'E_DEPRECATED'
-                );
+        1    => 'E_ERROR',
+        2    => 'E_WARNING',
+        4    => 'E_PARSE',
+        8    => 'E_NOTICE',
+        16   => 'E_CORE_ERROR',
+        32   => 'E_CORE_WARNING',
+        64   => 'E_COMPILE_ERROR',
+        128  => 'E_COMPILE_WARNING',
+        256  => 'E_USER_ERROR',
+        512  => 'E_USER_WARNING',
+        1024 => 'E_USER_NOTICE',
+        2047 => 'E_ALL',
+        2048 => 'E_STRICT',
+        4096 => 'E_RECOVERABLE_ERROR',
+        8192 => 'E_DEPRECATED'
+    );
 
     // clean up errfile
     $errfile = basename($errfile);
@@ -83,7 +81,7 @@ function appdb_error_handler($errno, $errstr, $errfile, $errline, $errcontext = 
         appdb_debug("error", "ERROR:[{$err[$errno]}] {$errfile}:{$errline} - {$errstr}");
 
     // do not fail on PHP STRICT or DEPRECIATED code on production site
-    if ($errno and ($errno == E_STRICT or $errno == E_DEPRECATED) and !$config->test_mode)
+    if ($errno and ($errno == E_STRICT or $errno == E_DEPRECATED) and APPDB_DEBUG == "0")
         return;
 
     // don't exit on a notice or warning
@@ -224,11 +222,11 @@ function apidb_fullurl($path = "")
  */
 function appdb_fullpath($path)
 {
-    /* IE: we know this file is in /yyy/xxx/include, we want to get the /yyy/xxx 
+    /* IE: we know this file is in /yyy/xxx/include, we want to get the /yyy/xxx
     /* so we call dirname  on this file path twice */
     $fullpath = dirname(dirname(__FILE__))."//".$path;
     /* get rid of potential double slashes due to string concat */
-    return str_replace("//", "/", $fullpath); 
+    return str_replace("//", "/", $fullpath);
 }
 
 /**
