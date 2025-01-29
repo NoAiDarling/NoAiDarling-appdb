@@ -969,7 +969,7 @@ class testData{
         // Display confirmation box for changing the Wine version
         $oOldTest = new testData($this->iTestingId);
         if($this->iTestingId && $oOldTest->sTestedRelease != $this->sTestedRelease
-            || $this-iTestingId && $oOldTest->iStaging != $this->iStaging)
+            || $this->iTestingId && $oOldTest->iStaging != $this->iStaging)
         {
             if(getInput('bConfirmTestedVersionChange', $aClean) != 'true')
             {
