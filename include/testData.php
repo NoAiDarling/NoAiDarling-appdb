@@ -1295,7 +1295,7 @@ class testData{
         return $oRow->cnt;
     }
 
-    public function objectGetFilterInfo()
+    public static function objectGetFilterInfo()
     {
         $oFilter = new FilterInterface();
 
