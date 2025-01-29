@@ -303,6 +303,10 @@ class Vendor {
     // returns an OMTableRow instance
     function objectGetTableRow()
     {
+        // Ensure that $this->aApplicationsIds is not null
+        if ( $this->aApplicationsIds == null )
+            $this->aApplicationsIds = [];
+
         $bDeleteLink = sizeof($this->aApplicationsIds) ? FALSE : TRUE;
 
         // create the html table row
