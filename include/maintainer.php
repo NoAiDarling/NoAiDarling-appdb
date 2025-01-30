@@ -379,7 +379,7 @@ class maintainer
         return new maintainer(null, $oRow);
     }
 
-    function deleteMaintainer($oUser, $iAppId = null, $iVersionId = null)
+    public static function deleteMaintainer($oUser, $iAppId = null, $iVersionId = null)
     {
         /* remove supermaintainer */
         if($iAppId && ($iVersionId == null))
@@ -406,7 +406,7 @@ class maintainer
         return false;
     }
 
-    function deleteMaintainersForVersion($oVersion)
+    public static function deleteMaintainersForVersion($oVersion)
     {
         if(!$oVersion->iVersionId)
             return FALSE;
@@ -416,7 +416,7 @@ class maintainer
         return $hResult;
     }
 
-    function deleteMaintainersForApplication($oApp)
+    public static function deleteMaintainersForApplication($oApp)
     {
         $sQuery = "DELETE from appMaintainers WHERE appId='?'";
         $hResult = query_parameters($sQuery, $oApp->iAppId);
@@ -450,7 +450,7 @@ class maintainer
         $oVersion->updateMaintainerState();
     }
 
-    function getSubmitterEmails()
+    public static function getSubmitterEmails()
     {
         $sRecipients = '';
         $sQuery = "SELECT DISTINCT(user_list.email) FROM appMaintainers, user_list WHERE
