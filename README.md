@@ -1,11 +1,14 @@
 # WineHQ Application Database
+https://gitlab.winehq.org/winehq/appdb
 
 Maintainer:
     Jeremy Newman <jnewman@codeweavers.com>
 
 Requirements:
- * PHP 7.4 or higher
+ * PHP 8 or higher
  * MySQL (or MariaDB)
+ * PHP-Curl
+ * PHP-GD
  * PHP-Mail
  * PHP-Mail-Mime
 
