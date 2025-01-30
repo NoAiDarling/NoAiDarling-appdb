@@ -85,8 +85,7 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
         $ret = $mail->send($to, array_merge($headers, $mime->headers()), $sMsg);
         if (PEAR::isError($ret))
         {
-            // FIXME: need to log email errors somewhere
-            //$errMsg = $ret->getMessage();
+            trigger_error($ret->getMessage(), E_USER_WARNING);
             $bEmailFail++;
         }
         unset($mail, $headers, $to, $ret);
