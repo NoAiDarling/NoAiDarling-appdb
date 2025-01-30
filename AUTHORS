@@ -1,4 +1,5 @@
 # WineHQ Application Database (AppDB) Authors and Contributors
+https://gitlab.winehq.org/winehq/appdb
 
 Maintainer:
     Jeremy Newman <jnewman@codeweavers.com>
@@ -10,7 +11,9 @@ Alexandre Julliard
 Alexandru Balut
 Alex Băluț
 Andre Hentschel
+Andrey Gusev
 Andrew Nguyen
+Antoine Le Gonidec
 Austin English
 Ben Hodgetts
 Charles Leop
@@ -18,8 +21,10 @@ Chris Morgan
 Christoph Korn
 daoo
 David Lee Lambert
+Damjan Jovanovic
 EA Durbin
 Edwin Smulders
+Elizabeth Figura
 Eric Blade
 Francois Gouget
 Henti Smith
@@ -38,6 +43,7 @@ Ofir Petruska
 Paul van Schayck
 Rafal Maj
 Ricardo Filipe
+Rosanne DiMesio
 Stefan Pflüger
 Tom Wickline
 Tony Lambregts
