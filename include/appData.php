@@ -134,7 +134,7 @@ class appData
             $this->iAppId = $iNewId;
     }
 
-    function listSubmittedBy($iUserId, $bQueued = true)
+    public static function listSubmittedBy($iUserId, $bQueued = true)
     {
         $sExtra = '';
         if($bQueued) // downloadurls are only queued together with versions
