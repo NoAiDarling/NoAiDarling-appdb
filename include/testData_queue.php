@@ -88,7 +88,7 @@ class testData_queue
     function outputEditor()
     {
         $this->oTestData->outputEditor();
-        
+
         echo "<table width='90%' border=0 cellpadding=2 cellspacing=0>\n";
         echo '<tr><td>';
 
@@ -96,28 +96,28 @@ class testData_queue
         if(!$this->oTestData->iTestingId)
         {
             echo '<b>Add new operating system:</b> use this form to add your operating system if it ';
-            echo 'is not in the dropdown list above.';    
+            echo 'is not in the dropdown list above.';
         }
 
         //queued test results with a queued distribution
         if($this->oDistribution->iDistributionId &&
-            $this->oDistribution->objectGetState() != 'accepted' 
-            && $this->canEdit()) 
+            $this->oDistribution->objectGetState() != 'accepted'
+            && $this->canEdit())
         {
             echo '<div class="alert alert-danger" role="alert">';
             echo '<b>New operating system added:</b> You may correct this submission ';
             echo 'by selecting an operating system from the list above ';
             echo 'or editing the information in the textboxes below. ';
             echo '</div>';
-        }  
+        }
         /* If the testData is already associated with a distribution and the
            distribution is un-queued, there is no need to display the
            distribution form. */
-        if(!$this->oTestData->iDistributionId || 
+        if(!$this->oTestData->iDistributionId ||
             $this->oDistribution->objectGetState() != 'accepted')
             echo $this->oDistribution->outputEditor();
-        
-        echo '</tr></td></table>';     
+
+        echo '</tr></td></table>';
     }
 
     function getOutputEditorValues($aClean)

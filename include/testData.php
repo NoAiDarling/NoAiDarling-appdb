@@ -128,9 +128,9 @@ class testData{
     // Update Test Results.
     function update($bSilent=false)
     {
-        // is the current user allowed to update this test result? 
+        // is the current user allowed to update this test result?
         $oVersion = new Version($this->iVersionId);
-        if(!$_SESSION['current']->hasPriv("admin") && 
+        if(!$_SESSION['current']->hasPriv("admin") &&
            !$_SESSION['current']->hasAppVersionModifyPermission($oVersion) &&
            !(($_SESSION['current']->iUserId == $this->iSubmitterId) && $this->sState != 'accepted'))
         {
@@ -156,13 +156,13 @@ class testData{
             $sWhatChanged .= "What does not work was changed from\n'"
                     .$oOldTest->shWhatDoesnt."'\n to\n'$this->shWhatDoesnt'.\n";
         }
-        
+
         if($this->sUsedWorkaround != $oOldTest->sUsedWorkaround)
         {
             $sWhatChanged .= "Workarounds was changed from\n'"
                     .$oOldTest->sUsedWorkaround."'\n to\n'$this->sUsedWorkaround'.\n";
         }
-        
+
         if($this->shWorkarounds != $oOldTest->shWorkarounds)
         {
             $sWhatChanged .= "Workarounds detail was changed from\n'"
@@ -220,7 +220,7 @@ class testData{
             $sWhatChanged .= "Tested release was changed from ".
                     $oOldTest->sTestedRelease." to $this->sTestedRelease.\n";
         }
-        
+
         if($this->iStaging != $oOldTest->iStaging)
         {
             $bUpdateRatingInfo = true;
@@ -238,7 +238,7 @@ class testData{
                 $bUpdateRatingInfo = true;
         }
 
-        if(query_parameters("UPDATE testResults SET 
+        if(query_parameters("UPDATE testResults SET
                                         versionId       = '?',
                                         whatWorks       = '?',
                                         whatDoesnt      = '?',
@@ -253,10 +253,10 @@ class testData{
                                         workarounds     = '?',
                                         testedRating    = '?',
                                         comments        = '?',
-                                        state           = '?', 
-                                        gpuMfr          = '?', 
+                                        state           = '?',
+                                        gpuMfr          = '?',
                                         graphicsDriver  = '?',
-                                        hasProblems     = '?' 
+                                        hasProblems     = '?'
                                     WHERE testingId = '?'",
                             $this->iVersionId,
                             $this->shWhatWorks,
@@ -304,9 +304,9 @@ class testData{
     // Purge test results from the database
     function purge()
     {
-        // is the current user allowed to delete this test result? 
+        // is the current user allowed to delete this test result?
         $oVersion = new Version($this->iVersionId);
-        if(!$_SESSION['current']->hasPriv("admin") && 
+        if(!$_SESSION['current']->hasPriv("admin") &&
            !$_SESSION['current']->hasAppVersionModifyPermission($oVersion) &&
            !(($_SESSION['current']->iUserId == $this->iSubmitterId) && !($this->sState == 'accepted')))
         {
@@ -315,7 +315,7 @@ class testData{
 
         // now we delete the data
         $sQuery = "DELETE FROM testResults
-                WHERE testingId = '?' 
+                WHERE testingId = '?'
                 LIMIT 1";
         if(!($hResult = query_parameters($sQuery, $this->iTestingId)))
             return false;
@@ -326,9 +326,9 @@ class testData{
     // Delete test results.
     function delete()
     {
-        // is the current user allowed to delete this test result? 
+        // is the current user allowed to delete this test result?
         $oVersion = new Version($this->iVersionId);
-        if(!$_SESSION['current']->hasPriv("admin") && 
+        if(!$_SESSION['current']->hasPriv("admin") &&
            !$_SESSION['current']->hasAppVersionModifyPermission($oVersion) &&
            !(($_SESSION['current']->iUserId == $this->iSubmitterId) && $this->sState != 'accepted'))
         {
@@ -337,7 +337,7 @@ class testData{
 
         // now we flag the data as deleted
         $sQuery = "UPDATE testResults SET state = 'deleted'
-                   WHERE testingId = '?' 
+                   WHERE testingId = '?'
                    LIMIT 1";
         if(!($hResult = query_parameters($sQuery, $this->iTestingId)))
         {
@@ -355,7 +355,7 @@ class testData{
     // Move Test Data out of the queue.
     function unQueue()
     {
-        // is the current user allowed to delete this test data? 
+        // is the current user allowed to delete this test data?
         $oVersion = new Version($this->iVersionId);
         if(!$_SESSION['current']->hasPriv("admin") &&
            !$_SESSION['current']->hasAppVersionModifyPermission($oVersion))
@@ -386,7 +386,7 @@ class testData{
 
     function Reject()
     {
-        // is the current user allowed to delete this test data? 
+        // is the current user allowed to delete this test data?
         $oVersion = new Version($this->iVersionId);
         if(!$_SESSION['current']->hasPriv("admin") &&
            !$_SESSION['current']->hasAppVersionModifyPermission($oVersion))
@@ -398,7 +398,7 @@ class testData{
         if($this->sState != 'queued')
             return false;
 
-        if(query_parameters("UPDATE testResults SET state = '?' WHERE testingId = '?'", 
+        if(query_parameters("UPDATE testResults SET state = '?' WHERE testingId = '?'",
                             'rejected', $this->iTestingId))
         {
             $this->sState = 'rejected';
@@ -410,7 +410,7 @@ class testData{
 
     function ReQueue()
     {
-        // is the current user allowed to requeue this data 
+        // is the current user allowed to requeue this data
         $oVersion = new Version($this->iVersionId);
         if(!$_SESSION['current']->hasPriv("admin") &&
            !$_SESSION['current']->hasAppVersionModifyPermission($oVersion) &&
@@ -520,7 +520,7 @@ class testData{
         }
     }
 
- 
+
     function SendNotificationMail($sAction="add",$sMsg=null)
     {
         global $aClean;
@@ -545,7 +545,7 @@ class testData{
                     if($aClean['sReplyText'])
                     {
                         $sMsg .= "Appdb admin reply text:\n";
-                        $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                        $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                     }
                     addmsg("The test data was successfully added into the database.", "green");
                 } else // test data queued.
@@ -564,11 +564,11 @@ class testData{
             case "reject":
                 $sSubject = "Test Results rejected for version ".$oVersion->sName." of ".$oApp->sName." by ".$_SESSION['current']->sRealname;
                 $sMsg  .= $sBacklink;
-                 // if replyText is set we should report the reason the data was rejected 
+                 // if replyText is set we should report the reason the data was rejected
                 if($aClean['sReplyText'])
                 {
                     $sMsg .= "Reason given:\n";
-                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any 
+                    $sMsg .= $aClean['sReplyText']."\n"; // append the reply text, if there is any
                 }
                 addmsg("test data rejected.", "green");
             break;
@@ -577,12 +577,12 @@ class testData{
         if($sEmail)
             mail_appdb($sEmail, $sSubject ,$sMsg);
     }
- 
+
     function ShowTestResult()
     {
         return "<p><b>What works</b></p>\n<p>{$this->shWhatWorks}</p>\n".
                "<p><b>What does not</b></p>\n<p>{$this->shWhatDoesnt}</p>\n".
-               "<p><b>Workarounds</b></p>\n<p>{$this->shWorkarounds}</p>\n".               
+               "<p><b>Workarounds</b></p>\n<p>{$this->shWorkarounds}</p>\n".
                "<p><b>What was not tested</b></p>\n<p>{$this->shWhatNotTested}</p>\n".
                "<p><b>Hardware tested</b></p>\n<p><i>Graphics: </i><ul><li>GPU: {$this->sGpuMfr}</li><li>Driver: {$this->sGraphicsDriver}</li></ul></p>".
                "<p><b>Additional Comments</b></p>\n<p>{$this->shComments}</p>\n";
@@ -692,7 +692,7 @@ class testData{
 
         $bShowAll = (getInput('bShowAll', $aClean) == 'true') ? true : false;
 
-        $sQuery = "SELECT * 
+        $sQuery = "SELECT *
                    FROM testResults, ?.versions
                    WHERE versionId = '?'
                    AND
@@ -702,7 +702,7 @@ class testData{
                    AND
                    state = '?'
                    ORDER BY versions.id DESC,testedDate DESC";
-	
+
         if(!$bShowAll)
             $sQuery.=" LIMIT 0,".$iDisplayLimit;
 
@@ -833,14 +833,14 @@ class testData{
         $sName = version::fullName($this->iVersionId);
 
         echo html_frame_start("Test Form - $sName", "90%", "", 0);
-        
+
         echo '<table class="whq-table whq-table-striped table-bordered" width="100%" border=0 cellpadding=2 cellspacing=0>';
-        
+
         // Installs
         echo '<tr><td><b>Installs?</b></td><td>',"\n";
         testData::make_Installs_list("sInstalls", $this->sInstalls);
         echo '&nbsp; Installing is an important part of testing under Wine. Select N/A if there is no installer.</td></tr>',"\n";
-       
+
         // Runs
         echo '<tr><td><b>Runs?</b></td><td>',"\n";
         testData::make_Runs_list("sRuns", $this->sRuns);
@@ -850,12 +850,12 @@ class testData{
         echo '<tr valign=top><td><b>What works</b></td>',"\n";
         echo '<td><p><textarea cols="80" rows="20" id="Test1" name="shWhatWorks" class="wysiwyg">';
         echo $this->shWhatWorks.'</textarea></p></td></tr>',"\n";
-        
+
         // What Does not work
         echo '<tr valign=top><td><b>What does not work</b></td>',"\n";
         echo '<td>';
         echo 'Were there any problems that do not exist in Windows? <br>';
-        if(isset($this->sHasProblems))        
+        if(isset($this->sHasProblems))
         {
             if($this->sHasProblems == "Yes")
             {
@@ -864,7 +864,7 @@ class testData{
             }else{
                 echo '<label class="radio-inline"><input type="radio"data-toggle="radioshow" data-target="#whatdoesnt" data-showdiv=true name="sHasProblems" value="Yes">Yes</label>';
                 echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#whatdoesnt" data-showdiv=false name="sHasProblems" value="No" checked>No</label>';
-            } 
+            }
         } else {
              echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#whatdoesnt" data-showdiv=true name="sHasProblems" value="Yes">Yes</label>';
              echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#whatdoesnt" data-showdiv=false name="sHasProblems" value="No">No</label>';
@@ -874,12 +874,12 @@ class testData{
         echo '<p><textarea cols="80" rows="20" id="Test2" name="shWhatDoesnt" class="wysiwyg">';
         echo $this->shWhatDoesnt.'</textarea></p></td></tr>',"\n";
         echo '</div>';
-        
+
         // Workarounds
         echo '<tr valign=top><td><b>Workarounds</b></td>',"\n";
         echo '<td>';
         echo 'Were any workarounds used for problems that do not exist in Windows? <br>';
-        if(isset($this->sUsedWorkaround))        
+        if(isset($this->sUsedWorkaround))
         {
             if($this->sUsedWorkaround == "Yes")
             {
@@ -888,23 +888,23 @@ class testData{
             }else{
                 echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#workarounds" data-showdiv=true  name="sUsedWorkaround" value="Yes">Yes</label>';
                 echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#workarounds" data-showdiv=false  name="sUsedWorkaround" value="No" checked>No</label>';
-            } 
+            }
         } else {
              echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#workarounds" data-showdiv=true name="sUsedWorkaround" value="Yes">Yes</label>';
              echo '<label class="radio-inline"><input type="radio" data-toggle="radioshow" data-target="#workarounds" data-showdiv=false name="sUsedWorkaround" value="No">No</label><br>';
         };
-        
+
         echo '<div id="workarounds" style="display:none">';
         echo '<i>Describe the workaround(s) in the box below.</i><br>';
         echo '<textarea cols="80" rows="20" id="Test4" name="shWorkarounds" class="wysiwyg">';
         echo $this->shWorkarounds.'</textarea></p></td></tr>',"\n";
         echo '</div>';
-        
+
         // What was not tested
         echo '<tr valign=top><td><b>What was not tested</b></td>',"\n";
         echo '<td><p><textarea cols="80" rows="20" id="Test3" name="shWhatNotTested" class="wysiwyg">';
         echo $this->shWhatNotTested.'</textarea></p></td></tr>',"\n";
-        
+
         // Date Tested
         echo '<tr valign=top><td><b>Date tested </b></td>',"\n";
         echo '<td><input type=text name="sTestedDate" value="'.$this->sTestedDate.'" size="20"><br>';
@@ -918,13 +918,13 @@ class testData{
         // Checkbox for Wine-staging
         echo '<label class="btn btn-secondary">';
         if($this->iStaging != 0)
-            echo '<input type="checkbox" name="iStaging" value="1" checked>';  
+            echo '<input type="checkbox" name="iStaging" value="1" checked>';
         else
             echo '<input type="checkbox" name="iStaging" value="1">';
         echo '  Wine-staging';
         echo '</label>';
         echo '</td></tr>',"\n";
-       
+
         // Rating
         echo '<tr><td><b>Rating</b></td><td>',"\n";
         echo make_maintainer_rating_list("sTestedRating", $this->sTestedRating);
@@ -941,9 +941,9 @@ class testData{
         echo '<td>';
         echo 'Graphics: ';
         echo  testData::make_gpuMfr_list("sGpuMfr", $this->sGpuMfr);
-        echo testData::make_graphicsDriver_list('sGraphicsDriver', $this->sGraphicsDriver); 
+        echo testData::make_graphicsDriver_list('sGraphicsDriver', $this->sGraphicsDriver);
         echo '</td></tr>';
-        
+
         // Distribution
         $oDistribution = new distribution($this->iDistributionId);
         $sDistributionHelp = "";
@@ -987,7 +987,7 @@ class testData{
         echo '<input type="hidden" name="iVersionId" value="'.$this->iVersionId.'" >';
         echo '<input type="hidden" name="iTestingId" value="'.$this->iTestingId.'" >';
         echo '<input type="hidden" name="iTestDataId" value="'.$this->iTestingId.'" >';
-        
+
         echo "</table>\n";
 
         echo html_frame_end();
@@ -998,14 +998,14 @@ class testData{
     {
         $errors = "";
         if (empty($aValues['shWhatWorks']) && ($aValues['sRuns'] == "Yes" || $aValues['sInstalls'] == "Yes" || $aValues['sInstalls'] == "No, but has workaround"))
-            $errors .= "<li>Please enter what worked.</li>\n";  
+            $errors .= "<li>Please enter what worked.</li>\n";
 
         if (empty($aValues['sHasProblems']))
             $errors .= "<li>Please enter whether the application had any problems not present in Windows.</li>\n";
 
         if (empty($aValues['shWhatNotTested']))
             $errors .= "<li>Please enter what was not tested.</li>\n";
-            
+
         if (empty($aValues['sUsedWorkaround']))
             $errors .= "<li>Please enter whether workarounds were used or not.</li>\n";
 
@@ -1014,12 +1014,12 @@ class testData{
 
         if (empty($aValues['sTestedRelease']))
             $errors .= "<li>Please enter the version of Wine that you tested with.</li>\n";
-            
+
         if (empty($aValues['sGpuMfr']))
             $errors .= "<li>Please select your GPU manufacturer from the list. If you don't know, select Unknown.</li>\n";
-            
+
          if (empty($aValues['sGraphicsDriver']))
-            $errors .= "<li>Please indicate whether your graphics driver is open source or proprietary. If you don't know, select unknown.</li>\n";   
+            $errors .= "<li>Please indicate whether your graphics driver is open source or proprietary. If you don't know, select unknown.</li>\n";
 
         // Ask for confirmation if changing the tested Wine versions, becase we want users
         // to submit new reports instead of updating existing ones when testing new Wines
@@ -1047,13 +1047,13 @@ class testData{
 
         if (empty($aValues['sRuns']))
             $errors .= "<li>Please enter whether this application runs or not.</li>\n";
-            
+
         if ($aValues['sHasProblems'] == "Yes" && empty($aValues['shWhatDoesnt']))
             $errors .= "<li>Please describe the problem(s) encountered.</li>\n";
-            
+
         if ($aValues['sUsedWorkaround'] == "Yes" && empty($aValues['shWorkarounds']))
             $errors .= "<li>Please describe the workaround(s) used for this application.</li>\n";
-                       
+
         if (empty($aValues['sTestedRating']))
             $errors .= "<li>Please enter a rating based on how well this application runs.</li>\n";
 
@@ -1061,10 +1061,10 @@ class testData{
         // are consistent
         if (($aValues['sInstalls'] == "No") && ($aValues['sTestedRating'] != GARBAGE_RATING))
             $errors .= "<li>Applications that do not install should be rated &#8216;Garbage&#8217;.</li>\n";
-        
+
         if (($aValues['sRuns'] == "No") && ($aValues['sTestedRating'] != GARBAGE_RATING))
             $errors .= "<li>Applications that do not run should be rated &#8216;Garbage&#8217;.</li>\n";
-            
+
         if (($aValues['sHasProblems'] == "Yes" || $aValues['sUsedWorkaround'] == "Yes") && $aValues['sTestedRating'] == PLATINUM_RATING)
             $errors .= "<li>An application can only get a Platinum rating if it installs, runs, and everything works &#8216;out of the box&#8217; (no problems and no workarounds used).</li>\n";
 
@@ -1078,26 +1078,26 @@ class testData{
         // if the application does not install
         if (($aValues['sInstalls'] != "No") && ($aValues['sRuns'] == "Not installable"))
             $errors .= "<li>You can only set Runs? to &#8216;Not installable&#8217; if Installs? is set &#8216;No&#8217;</li>\n";
-	    
+
         if (($aValues['sInstalls'] == "No") && ($aValues['sRuns'] != "Not installable"))
             $errors .= "<li>Runs? must be set to &#8216;Not installable&#8217; if Installs? is set to &#8216;No&#8217;.</li>\n";
-            
-        if ($aValues['sInstalls'] == "No, but has workaround" && ($aValues['sUsedWorkaround'] == "No" || empty($aValues[shWorkarounds])))
-            $errors .= "<li>If Installs? is set to &#8216;No, but has workaround&#8216;, Workarounds must be set to &#8216;Yes&#8216; and details provided in the text area.</li>\n";           
+
+        if ($aValues['sInstalls'] == "No, but has workaround" && ($aValues['sUsedWorkaround'] == "No" || empty($aValues['shWorkarounds'])))
+            $errors .= "<li>If Installs? is set to &#8216;No, but has workaround&#8216;, Workarounds must be set to &#8216;Yes&#8216; and details provided in the text area.</li>\n";
 
         if (($aValues['sInstalls'] == "No" || $aValues['sInstalls'] == "No, but has workaround") && $aValues['sHasProblems'] == "No")
             $errors .= "<li>If Installs? is set to &#8216;No&#8216; or &#8216;No, but has workaround&#8216;, you must answer Yes to the question about problems and provide details in the What does not work text area.</li>\n";
-            
+
         if ($aValues['sRuns'] == "No" && $aValues['sHasProblems'] == "No" )
             $errors .="<li>If Runs? is set to &#8216;No&#8216; you must answer Yes to the question about problems and provide details in the What does not work text area.</li>\n";
-            
+
         if ($aValues['sHasProblems'] == "No" && $aValues['sUsedWorkaround'] == 'Yes')
             $errors .= "<li>Workarounds should not have been used if there were no problems that are not also present in Windows.</li>";
-                        
-        if ($aValues['sHasProblems'] == "No" && !empty($aValues[shWhatDoesnt]))
+
+        if ($aValues['sHasProblems'] == "No" && !empty($aValues['shWhatDoesnt']))
             $errors .="<li>Leave the What does not work text field blank if there were no problems that are not also present in Windows.</li>";
-            
-        if ($aValues['sUsedWorkaround'] == "No" && !empty($aValues[shWorkarounds]))
+
+        if ($aValues['sUsedWorkaround'] == "No" && !empty($aValues['shWorkarounds']))
             $errors .="<li>Leave the Workarounds text field blank if no workarounds were used.</li>";
 
         return $errors;
@@ -1119,13 +1119,13 @@ class testData{
         $this->shWorkarounds = $aValues['shWorkarounds'];
         $this->shWhatNotTested = $aValues['shWhatNotTested'];
         $this->sTestedDate = $aValues['sTestedDate'];
-        
+
         //Favor distribution dropdown list selections over textboxes.
         if($aValues['iTestDistributionId'])
             $this->iDistributionId = $aValues['iTestDistributionId'];
         else
             $this->iDistributionId = $aValues['iDistributionId'];
-            
+
         $this->sTestedRelease = $aValues['sTestedRelease'];
         $this->iStaging = intval($aValues['iStaging']);
         $this->sInstalls = $aValues['sInstalls'];
@@ -1171,14 +1171,14 @@ class testData{
         }
         echo "</select>\n";
     }
-    
+
     function make_gpuMfr_list($sVarname, $sSelectedValue)
     {
         echo "<select name='$sVarname'class='form-control form-control-inline'>\n";
         echo "<option value=\"Unknown\">GPU manufacturer?</option>\n";
         $aGpuMfr = array('AMD', 'Intel', 'Nvidia', 'Other', 'Unknown');
         $iMax = count($aGpuMfr);
-        
+
         for($i=0; $i < $iMax; $i++)
         {
             if($aGpuMfr[$i] == $sSelectedValue)
@@ -1188,15 +1188,15 @@ class testData{
         }
         echo "</select>\n";
     }
-    
+
     function make_graphicsDriver_list($sVarname, $sSelectedValue)
-    
+
     {
         echo "<select name='$sVarname' class='form-control form-control-inline'>\n";
         echo "<option value=\"unknown\">Open source or proprietary driver?</option>\n";
         $aGraphicsDriver = array('open source', 'proprietary', 'unknown');
         $iMax = count($aGraphicsDriver);
-        
+
         for($i=0; $i < $iMax; $i++)
         {
             if($aGraphicsDriver[$i] == $sSelectedValue)
@@ -1642,7 +1642,7 @@ class testData{
         echo " Instead report the crash as a bug in the Wine bugzilla at \n";
         echo "<a href=\"//bugs.winehq.org\">bugs.winehq.org</a>.\n";
         echo "We ask that you use bugzilla because developers do not monitor the AppDB \n";
-        echo "for bugs.</b></p>\n"; 
+        echo "for bugs.</b></p>\n";
         echo "<p>Please be as detailed as you can but do not paste large \n";
         echo "chunks of output from the terminal. Type out your report \n";
         echo "clearly and in proper English so that it is easily readable.</p>\n";
@@ -1669,7 +1669,7 @@ class testData{
         }
     }
 
-    function allowAnonymousSubmissions()
+    public static function allowAnonymousSubmissions()
     {
         return FALSE;
     }
