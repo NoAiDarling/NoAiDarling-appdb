@@ -1082,7 +1082,7 @@ class testData{
         if (($aValues['sInstalls'] == "No") && ($aValues['sRuns'] != "Not installable"))
             $errors .= "<li>Runs? must be set to &#8216;Not installable&#8217; if Installs? is set to &#8216;No&#8217;.</li>\n";
             
-        if ($aValues['sInstalls'] == "No, but has workaround" && ($aValues['sUsedWorkaround'] == "No" || empty($aValues[shWorkarounds])))
+        if ($aValues['sInstalls'] == "No, but has workaround" && ($aValues['sUsedWorkaround'] == "No" || empty($aValues['shWorkarounds'])))
             $errors .= "<li>If Installs? is set to &#8216;No, but has workaround&#8216;, Workarounds must be set to &#8216;Yes&#8216; and details provided in the text area.</li>\n";           
 
         if (($aValues['sInstalls'] == "No" || $aValues['sInstalls'] == "No, but has workaround") && $aValues['sHasProblems'] == "No")
