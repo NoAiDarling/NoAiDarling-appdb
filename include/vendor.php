@@ -74,7 +74,7 @@ class Vendor {
         {
             if(query_num_rows($hResult))
             {
-                $this->vendor($oRow->vendorId);
+                $this->__construct($oRow->vendorId);
 
                 if(!$this->mustBeQueued())
                     $this->unQueue();
@@ -92,7 +92,7 @@ class Vendor {
         if($hResult)
         {
             $this->iVendorId = query_appdb_insert_id();
-            $this->vendor($this->iVendorId);
+            $this->__construct($this->iVendorId);
             return true;
         }
         else
