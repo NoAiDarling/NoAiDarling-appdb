@@ -646,7 +646,7 @@ class maintainer
     }
 
     /* Returns true if the given app has a maintainer, false otherwise */
-    public function appHasMaintainer($iAppId)
+    public static function appHasMaintainer($iAppId)
     {
         $hResult = query_parameters("SELECT COUNT(maintainerId) as count FROM appMaintainers WHERE appId = '?' AND superMaintainer = '1' AND state = 'accepted'", $iAppId);
 
