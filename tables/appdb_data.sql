@@ -1,5 +1,3 @@
-use apidb;
-
 INSERT INTO appCategory VALUES ('0', 'MAIN', 'Root category', NULL);
 UPDATE appCategory SET catId = '0' WHERE catName = 'MAIN' LIMIT 1;
 INSERT INTO appCategory VALUES (1, 'Audio', 'Audio related applications', 29);
@@ -64,3 +62,17 @@ INSERT INTO appCategory VALUES (116, 'Chemistry', 'All kinds of application used
 INSERT INTO appCategory VALUES (123, 'Installers', 'Program installers like installshield, windows installer etc.', 0);
 INSERT INTO appCategory VALUES (124, 'Electronics design', '', 0);
 INSERT INTO appCategory VALUES (125, 'Religious', 'Bible research software, tours of the holy land...', 0);
+
+INSERT INTO prefs_list (name,def_value,value_list,description) VALUES ('debug', 'no', 'yes|no', 'Enable debugging information');
+INSERT INTO prefs_list (name,def_value,value_list,description) VALUES ('window:offsite', 'no', 'yes|no', 'Display offsite URLs in a new window');
+INSERT INTO prefs_list (name,def_value,value_list,description) VALUES ('confirm_comment_deletion', 'yes', 'yes|no', 'Ask why you are deleting a comment before deleting it');
+INSERT INTO prefs_list (name,def_value,value_list,description) VALUES ('send_email', 'yes', 'yes|no', 'Send email notifications');
+INSERT INTO prefs_list (name,def_value,value_list,description) VALUES ('htmleditor', 'for supported browsers', 'always|for supported browsers|never', 'Display a graphical HTML editor in certain text fields');
+INSERT INTO prefs_list (name,def_value,value_list,description,show_for_group) VALUES ('disable_global_emails', 'no', 'yes|no', 'Disable global e-mail notifications (only send for maintained apps)', 'admin');
+
+insert into user_list values (NOW(), 0, password('testing'), 'Administrator',
+	'Admin@localhost', NOW(), NOW(), 'false' ,'' );
+update user_list set userid = 1000 where email = 'Admin@localhost';
+
+
+insert into user_privs values (1000, 'admin');

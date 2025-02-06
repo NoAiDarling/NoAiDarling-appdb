@@ -1,4 +1,0 @@
-#! /bin/sh
-
-echo Creating fake Bugzilla tables
-mysql -u root -p < bugzilla_tables.sql

@@ -22,8 +22,8 @@ Reccommended:
 
 2. ```cp include/config.php.sample include/config.php```
 
-3. Edit ```include/config.php``` as you see fit, the default name of the database 
-    used in the table creation step below is "apidb", you'll have to modify 
+3. Edit ```include/config.php``` as you see fit, the default name of the database
+    used in the table creation step below is "apidb", you'll have to modify
     these files if you change this in config.php
 
     **NOTE:** You must update the ```APPDB_ROOT``` entry to be YOUR url to the application database
@@ -34,9 +34,10 @@ Reccommended:
     entries in pretty much every file in the /tables/ directory. The recommendation is to
     leave the default value of APPS_DB to keep things simple
 
-4. to create the database tables: ```cd tables; ./create_tables```
+4. to create the database tables: ```cd tables; ./create_appdb.sh```
+   Note: Edit the file first for your specific database needs.
 
-5. Look in include/config.php at the ```APPS_DBUSER``` and ```APPS_DBPASS``` defines. 
+5. Look in include/config.php at the ```APPS_DBUSER``` and ```APPS_DBPASS``` defines.
     Ensure that this user and password exist in your mysql users list and that this user
     has been granted 'SELECT', 'INSERT', 'UPDATE' and 'DELETE' privileges on the database
     defined by the value of ```APPS_DB``` in ```include/config.php```
@@ -49,4 +50,5 @@ Reccommended:
     **email:** admin@localhost **password:** testing
 
 8. You can either set up a real bugzilla database or a fake one.
-to create the fake bugzilla tables: ```cd tables; ./create_bugzilla_tables```
+    to create the fake bugzilla tables: ```cd tables; ./create_bugzilla.sh```
+    Note: Edit the file first for your specific database needs.
