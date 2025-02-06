@@ -214,8 +214,10 @@ class Image {
                              $iNewWidth,$iNewHeight,$this->iWidth,$this->iHeight);
         }
         
-        $this->set_debuglog("imagecopyresized($oNewImage,$this->oImage,0,0,0,0,$iNewWidth,"
-                            ."$iNewHeight,$this->iWidth,$this->iHeight);");
+        // FIXME: With PHP 8, GdImage can not be converted to a string, so this log entry must be updated to no longer rely on that conversion.
+        // Using $this->sFile would lose the distinction between $oNewImage and $this->oImage, so we need to find something else.
+        // $this->set_debuglog("imagecopyresized($oNewImage,$this->oImage,0,0,0,0,$iNewWidth,"
+        //                    ."$iNewHeight,$this->iWidth,$this->iHeight);");
         imagedestroy($this->oImage);
         $this->oImage = $oNewImage;
         $this->iWidth = $iNewWidth;
@@ -264,9 +266,11 @@ class Image {
                              $this->iWidth,$this->iHeight);
         }
         
-        $this->set_debuglog("imagecopyresized($new,$this->oImage,$iBorderWidth,$iBorderWidth,0,0,"
-                           ." $iNewWidth,$iNewHeight,$this->iWidth,$this->iHeight); with a $iBorderWidth px border"
-                           ." in $sBorderColor");
+        // FIXME: With PHP 8, GdImage can not be converted to a string, so this log entry must be updated to no longer rely on that conversion.
+        // Using $this->sFile would lose the distinction between $new and $this->oImage, so we need to find something else.
+        // $this->set_debuglog("imagecopyresized($new,$this->oImage,$iBorderWidth,$iBorderWidth,0,0,"
+        //                    ." $iNewWidth,$iNewHeight,$this->iWidth,$this->iHeight); with a $iBorderWidth px border"
+        //                    ." in $sBorderColor");
         imagedestroy($this->oImage);
         $this->oImage = $new;
         $this->iWidth = $iNewWidth;
@@ -299,9 +303,11 @@ class Image {
             imagecopy($this->oImage, $oWatermark, $iWatermark_x, $iWatermark_y,
                       0, 0, $iWatermarkWidth, $iWatermarkHeight); 
             
-            $this->set_debuglog("imagecopy($this->oImage, $oWatermark,"
-                                ."$iWatermark_x, $iWatermark_y, 0, 0,"
-                                ."$iWatermarkWidth, $iWatermarkHeight);");
+            // FIXME: With PHP 8, GdImage can not be converted to a string, so this log entry must be updated to no longer rely on that conversion.
+            // Using $this->sFile would lose the distinction between $this->oImage and $oWatermark (is this a GdImage object too?), so we need to find something else.
+            // $this->set_debuglog("imagecopy($this->oImage, $oWatermark,"
+            //                     ."$iWatermark_x, $iWatermark_y, 0, 0,"
+            //                     ."$iWatermarkWidth, $iWatermarkHeight);");
         }
     }
     

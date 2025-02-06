@@ -167,7 +167,7 @@ class downloadurl
     }
 
     /* Process data from a Download URL form */
-    function ProcessForm($aValues)
+    public static function ProcessForm($aValues)
     {
         /* Check that we are processing a Download URL form */
         if($aValues["sSubmit"] != "Update Download URLs")
