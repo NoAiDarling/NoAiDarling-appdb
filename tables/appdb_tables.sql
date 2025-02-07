@@ -379,7 +379,22 @@ CREATE TABLE `testResults` (
   `gpuMfr` enum('AMD','Intel','Nvidia','Other','Unknown') DEFAULT NULL,
   `graphicsDriver` enum('open source','proprietary','unknown') DEFAULT NULL,
   `hasProblems` enum('Yes','No') DEFAULT NULL,
-  KEY `testingId` (`testingId`)
+  KEY `testingId` (`testingId`),
+  KEY `versionId` (`versionId`),
+  KEY `testedDate` (`testedDate`),
+  KEY `distributionId` (`distributionId`),
+  KEY `testedRelease` (`testedRelease`(255)),
+  KEY `staging` (`staging`),
+  KEY `installs` (`installs`),
+  KEY `runs` (`runs`),
+  KEY `usedWorkaround` (`usedWorkaround`),
+  KEY `testedRating` (`testedRating`),
+  KEY `submitTime` (`submitTime`),
+  KEY `submitterId` (`submitterId`),
+  KEY `state` (`state`),
+  KEY `gpuMfr` (`gpuMfr`),
+  KEY `graphicsDriver` (`graphicsDriver`),
+  KEY `hasProblems` (`hasProblems`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
