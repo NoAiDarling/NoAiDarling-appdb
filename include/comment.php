@@ -76,7 +76,7 @@ class Comment {
 
         if($hResult)
         {
-            $this->comment(query_appdb_insert_id());
+            $this->__construct(query_appdb_insert_id());
             $sEmail = User::get_notify_email_address_list($this->iAppId, $this->iVersionId);
             $sEmail .= $this->oOwner->sEmail." ";
 

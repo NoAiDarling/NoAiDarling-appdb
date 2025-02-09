@@ -116,7 +116,7 @@ class screenshot
                 }
             }
 
-            $this->screenshot($this->iScreenshotId,$this->bQueued);
+            $this->__construct($this->iScreenshotId,$this->bQueued);
             $this->mailMaintainers();
             return true;
         }
