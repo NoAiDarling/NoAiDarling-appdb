@@ -658,7 +658,7 @@ class maintainer
     }
 
     /* Returns true if the given version has a maintainer, false otherwise */
-    public function versionHasMaintainer($iVersionId)
+    public static function versionHasMaintainer($iVersionId)
     {
         $oVersion = new version($iVersionId);
         $hResult = query_parameters("SELECT COUNT(maintainerId) as count FROM appMaintainers WHERE (appId = '?' AND superMaintainer = '1') OR (versionId = '?') AND state = 'accepted'", $oVersion->iAppId, $iVersionId);
