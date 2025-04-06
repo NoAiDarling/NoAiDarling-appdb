@@ -457,7 +457,7 @@ class Url {
         return TRUE;
     }
 
-    function canEdit($iVersionId = NULL, $iAppId = NULL)
+    public static function canEdit($iVersionId = NULL, $iAppId = NULL)
     {
         if($_SESSION['current']->hasPriv("admin"))
             return TRUE;
