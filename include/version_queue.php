@@ -193,7 +193,7 @@ class version_queue
             echo html_frame_end();
         }
 
-        echo $this->oDownloadUrl->outputEditorSingle($this->oVersion->iVersionId,
+        echo downloadurl::outputEditorSingle($this->oVersion->iVersionId,
                 $aClean);
         $this->oTestDataQueue->outputEditor();
 

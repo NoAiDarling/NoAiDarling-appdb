@@ -230,7 +230,7 @@ class application_queue
 
             global $aClean;
 
-            echo $this->oVersionQueue->oDownloadUrl->outputEditorSingle(
+            echo downloadurl::outputEditorSingle(
                     $this->oVersionQueue->oVersion->iVersionId, $aClean);
 
             $this->oVersionQueue->oTestDataQueue->outputEditor();

@@ -84,7 +84,7 @@ class downloadurl
     }
 
     /* Output an editor for Download URL fields */
-    function outputEditor($oVersion = null, $sFormAction = null)
+    public static function outputEditor($oVersion = null, $sFormAction = null)
     {
         /* If we do not get any parameters we try to behave like a proper objectManager
            object, by only showing an editor for one entry instead of several.  This
@@ -268,7 +268,7 @@ class downloadurl
         return ($this->bQueued) ? 'queued' : 'accepted';
     }
 
-    function canEdit($iVersionId = NULL)
+    public static function canEdit($iVersionId = NULL)
     {
         if($_SESSION['current']->hasPriv("admin") ||
            ($iVersionId &&
@@ -277,14 +277,14 @@ class downloadurl
             return TRUE;
         } else
         {
-            $oVersion = new version($this->iVersionId);
+            $oVersion = new version($iVersionId);
 
             return $oVersion->canEdit();
         }
     }
 
     /* Output an editor for a single new URL */
-    function outputEditorSingle($iVersionId = NULL, $aValues = NULL)
+    public static function outputEditorSingle($iVersionId = NULL, $aValues = NULL)
     {
         if($aValues["sDownloadUrlUrl"] &&
            $aValues["sDownloadUrlDescription"])
