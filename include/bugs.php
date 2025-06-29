@@ -755,7 +755,7 @@ function view_version_bugs($iVersionId = null, $aBuglinkIds)
             {
                 $oM = new objectManager("bug");
                 $oM->setReturnTo($oVersion->objectMakeUrl());
-                echo "<td class=\"text-center\"><a href=\"".$oM->makeUrl("delete", $oBuglink->iLinkId)."&amp;sSubmit=delete\" class=\"btn btn-default btn-skinny\"><i class=\"fa fa-trash-o\"></i></a></td>\n";
+                echo "<td class=\"text-center\"><a href=\"".$oM->makeUrl("Delete", $oBuglink->iLinkId)."&amp;sSubmit=Delete\" class=\"btn btn-default btn-skinny\"><i class=\"fa fa-trash-o\"></i></a></td>\n";
                 if ($oBuglink->bQueued)
                 {
                     echo "<td class=\"text-center\"><a href=\"".$oM->makeUrl("edit", $oBuglink->iLinkId)."&amp;sSubmit=Submit&amp;bIsQueue=true\" class=\"btn btn-default btn-skinny\"><i class=\"fa fa-check\"></i></a></td>\n";
