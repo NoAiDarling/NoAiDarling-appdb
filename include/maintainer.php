@@ -357,7 +357,7 @@ class maintainer
         return TRUE;
     }
 
-    public function findAppMaintainer($iUserId, $iAppId)
+    public static function findAppMaintainer($iUserId, $iAppId)
     {
         $hResult = query_parameters("SELECT * FROM appMaintainers WHERE userId = '?' AND appId = '?' AND superMaintainer = '1'", $iUserId, $iAppId);
 
@@ -368,7 +368,7 @@ class maintainer
         return new maintainer(null, $oRow);
     }
 
-    public function findVersionMaintainer($iUserId, $iVersionId)
+    public static function findVersionMaintainer($iUserId, $iVersionId)
     {
         $hResult = query_parameters("SELECT * FROM appMaintainers WHERE userId = '?' AND versionId = '?'", $iUserId, $iVersionId);
 
