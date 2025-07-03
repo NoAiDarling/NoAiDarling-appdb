@@ -51,26 +51,8 @@ class Bug
             $this->bQueued = ($oRow->state=='queued') ? true : false;
             $this->sSubmitTime = $oRow->submitTime;
             $this->iSubmitterId = $oRow->submitterId;
-            /* lets fill in some blanks */ 
-            if ($this->iBug_id)
-            {
-                $sQuery = "SELECT *
-                              FROM bugs 
-                              WHERE bug_id = ".$this->iBug_id;
-                if($hResult = query_bugzilladb($sQuery))
-                {
-                    $oRow = query_fetch_object($hResult);
-                    if($oRow)
-                    {
-                        $this->sShort_desc = $oRow->short_desc;
-                        $this->sBug_status = $oRow->bug_status;
-                        $this->sResolution = $oRow->resolution;
-                    }
-                }
-            }
         }
     }
- 
 
     /**
      * Creates a new Bug.
@@ -96,17 +78,22 @@ class Bug
             return false;
         }
 
-        /* check that bug # exists in bugzilla*/
-        $sQuery = "SELECT *
-                   FROM bugs 
-                   WHERE bug_id = ".$this->iBug_id;
-        $sResult = query_bugzilladb($sQuery, "checking bugzilla");
-        if(query_num_rows($sResult) == 0)
+        // HTTP/GETs Bugzilla html bug list page to parse via search url
+        $sBugsSearchUrl = "https://bugs.winehq.org/buglist.cgi?columnlist=short_desc%2Cbug_status%2Cresolution%2C&f1=bug_id&f2=bug_id&f3=bug_id&j_top=OR&o1=equals&o2=equals&o3=equals&order=Importance&query_format=advanced&v1=" . $this->iBug_id;
+        $sHtml = file_get_contents($sBugsSearchUrl);
+        $oDom = new DOMDocument('1.0', 'utf-8');
+        $oDom->loadHTML($sHtml);
+
+        // Parses html for <table class="bz_buglist"> containing bug list
+        $oXpath = new DomXPath($oDom);
+        $aTbls = $oXpath->query("//*[@class='bz_buglist']");
+
+        // Displays first only Bugzilla <table class='bz_buglist'>
+        if ($aTbls->count() == 0)
         {
             addmsg("There is no bug in Bugzilla with that bug number.", "red");
             return false;
         }
-        unset($sResult);
 
         /* Check for duplicates */
         if($this->isDuplicate())
@@ -437,9 +424,7 @@ class Bug
 
         if(getInput('onlyWithoutMaintainers', $aOptions) == 'true')
         {
-            $sExtraTables = ',appVersion';
-
-            $sWhereFilter .= " AND appVersion.hasMaintainer = 'false' AND appVersion.versionId = buglinks.versionId";
+            $sWhereFilter .= " AND appVersion.hasMaintainer = 'false'";
         }
 
         /* Selecting 0 rows makes no sense, so we assume the user
@@ -478,7 +463,14 @@ class Bug
                                         $sState, $iStart, $iRows);
         } else
         {
-            $sQuery = "select * from buglinks$sExtraTables where buglinks.state = '?'$sWhereFilter LIMIT ?, ?";
+            $sQuery = "SELECT *
+                 FROM buglinks
+                 LEFT JOIN appVersion
+                 ON buglinks.versionId = appVersion.versionId
+                 LEFT JOIN appFamily
+                 ON appVersion.appId = appFamily.appId
+                 WHERE buglinks.state = '?' $sWhereFilter
+                 LIMIT ?, ?";
             $hResult = query_parameters($sQuery, $sState, $iStart, $iRows);
         }
 
@@ -555,63 +547,270 @@ class Bug
 
     function objectGetHeader()
     {
-        $oTableRow = new TableRow();
+        // Header handled by objectDrawCustomTable
+        return NULL;
+    }
+
+    function objectWantCustomDraw($sWhat, $sQueued)
+    {
+        //return false;
+        switch($sWhat)
+        {
+            case 'table':
+                if($sQueued == 'false')
+                    return true;
+                break;
+        }
+
+        return false;
+    }
+
+     public static function objectDrawCustomTable($hResult, $sQueued, $bCanEdit=false, $sAllBugs=true)
+    {
+        // Adds bug ids to Bugzilla url search params
+        $sBugIds = "";
+        for($i = 1; $oRow = query_fetch_object($hResult); $i++)
+        {
+            $sBugIds .= $oRow->bug_id;
+
+            if ($i < $hResult->num_rows)
+                $sBugIds .= "%2C%20"; // Adds comma separator ", " between bug_ids
+        }
+
+        $sBugsSearchOpen = "";
+        if(!$sAllBugs)
+        {
+            $sBugsSearchOpen = "&f1=bug_status&o1=notsubstring&v1=clos";
+        }
         
-        $oTableRow->AddTextCell("Bug #");
+        // HTTP/GETs Bugzilla html bug list page to parse via search url
+        $sBugsSearchUrl = BUGZILLA_ROOT."/buglist.cgi?bug_id=$sBugIds&bug_id_type=anyexact&order=Importance&query_format=advanced&columnlist=short_desc%2Cbug_status".$sBugsSearchOpen;
 
-        $oTableCell = new TableCell("Status");
-        $oTableCell->SetAlign("center");
-        $oTableRow->AddCell($oTableCell);
+        $sHtml = file_get_contents($sBugsSearchUrl);
+        $oDom = new DOMDocument('1.0', 'utf-8');
+        $oDom->loadHTML($sHtml);
 
-        $oTableRow->AddTextCell("Bug description");
+        // Parses html for <table class="bz_buglist"> containing bug list
+        $oXpath = new DomXPath($oDom);
+        $aTbls = $oXpath->query("//*[@class='bz_buglist']");
+        $aTblrows = $oXpath->query("//*[@class='bz_buglist']//tr");
 
-        $oTableCell = new TableCell("Application name");
-        $oTableCell->SetAlign("center");
-        $oTableRow->AddCell($oTableCell);
+        // Displays first only Bugzilla <table class='bz_buglist'>
+        if ($aTbls->count() > 0)
+        {
+            $oTbl = $aTbls->item(0);
 
-        $oTableCell = new TableCell("Version");
-        $oTableCell->SetAlign("center");
-        $oTableRow->AddCell($oTableCell);
+            // Overrides <table class="">
+            // Replaces bugz style class with appdb css pattern matches */
+            $oTbl->setAttribute('class', 'whq-table whq-table-full');
 
-        $oTableCell = new TableCell("Has maintainer");
-        $oTableCell->SetAlign("center");
-        $oTableRow->AddCell($oTableCell);
+            // Inserts <thead> to <table> consistent with appdb css pattern matching
+            $oTblhead = $oDom->createElement("thead");
+            $oTblbody = $oTbl->firstChild;
+            $oTbl->insertBefore($oTblhead, $oTblbody);
+        }
 
-        return $oTableRow;
+        // Inits <tr> header detect flag
+        $bIsTblhead = true;
+
+        $aBugIdRows = [];
+        // Iterates each <tr>
+        foreach ($aTblrows as $oTblrow) {
+
+            // Uses header flag to detect <table> header
+            // Assumes first <table> <tr> is header
+            if ($bIsTblhead)
+            {
+                $bIsTblhead = false;
+
+                $iTblcell_count = 0;
+
+                // Iterates each <tr> child
+                foreach ($oTblrow->childNodes as $oTblcell) {
+
+                    // Skips <tr> without children
+                    // Treats empty childNodes as ignored padding */
+                    if ($oTblcell->childNodes->length == 0)
+                        continue;
+
+                    // TODO: support <a> link click header sorting */
+                    // Assigns nodeValue <td>
+                    // Replaces <a> links with it's inner text
+                    $oTblcell->nodeValue = $oTblcell->nodeValue;
+
+                    // Skips < width=80> for description in cell 1 for readability
+                    if ($iTblcell_count++ == 1)
+                        continue;
+
+                    $oTblcell->setAttribute("width", 80);
+                }
+
+                // Removes first <tr> from <tbody>
+                $oTblbody->removeChild($oTblrow);
+
+                // Adds <tr> to <thead> consistent with css pattern matches */
+                $oTblhead->appendChild($oTblrow);
+
+                // Adds appdb-specific extras to <table> <thead> from bugzilla
+                $oTblcell = $oDom->createElement("th");
+                $oTblrow->appendChild($oTblcell);
+                $oTblcell->nodeValue = "App Name";
+                $oTblcell->setAttribute("width", 80);
+
+                // Adds appdb-specific extras to <table> <thead> from bugzilla
+                $oTblcell = $oDom->createElement("th");
+                $oTblrow->appendChild($oTblcell);
+                $oTblcell->nodeValue = "App Version";
+                $oTblcell->setAttribute("width", 80);
+
+                $oTblcell = $oDom->createElement("th");
+                $oTblrow->appendChild($oTblcell);
+                $oTblcell->nodeValue = "Has Maintainer";
+                $oTblcell->setAttribute("width", 80);
+
+                $oTblcell = $oDom->createElement("th");
+                $oTblrow->appendChild($oTblcell);
+                $oTblcell->nodeValue = "Other apps affected";
+                $oTblcell->setAttribute("width", 80);
+
+                if ($bCanEdit)
+                {
+                    $oTblcell = $oDom->createElement("th");
+                    $oTblrow->appendChild($oTblcell);
+                    $oTblcell->nodeValue = "Delete";
+                    $oTblcell->setAttribute("width", 80);
+
+                    $oTblcell = $oDom->createElement("th");
+                    $oTblrow->appendChild($oTblcell);
+                    $oTblcell->nodeValue = "Edit";
+                    $oTblcell->setAttribute("width", 80);
+                }
+            }
+            else
+            {
+                // Extracts bugId from Bugzilla ID table row cell of index 1
+                $oBugIdCell = $oTblrow->childNodes[1];
+                $iBugId = trim($oBugIdCell->nodeValue);
+                $sHref = $oBugIdCell->childNodes[1]->getAttribute("href");
+                $oBugIdCell->childNodes[1]->setAttribute("href", BUGZILLA_ROOT.$sHref);
+
+                $oBugDescCell = $oTblrow->childNodes[3];
+                $sHref = $oBugDescCell->childNodes[1]->getAttribute("href");
+                $oBugDescCell->childNodes[1]->setAttribute("href", BUGZILLA_ROOT.$sHref);
+
+                $aBugIdRows[$iBugId] = $oTblrow->cloneNode(true);
+                $oTblrow->parentNode->removeChild($oTblrow);
+            }
+        }
+
+        // Set loop index back to first element to loop again
+        query_data_seek($hResult, 0);
+        for($i = 1; $oRow = query_fetch_object($hResult); $i++)
+        {
+            if (!array_key_exists($oRow->bug_id, $aBugIdRows))
+            {
+                continue;
+            }
+            
+            //$oTblrow = $oDom->cloneNode("tr");
+            $oTblrow = $aBugIdRows[$oRow->bug_id]->cloneNode(true);
+            $oTbl->appendChild($oTblrow);
+
+            // Adds extra appdb <table> cells to bugz <table>
+            $oTblcell = $oDom->createElement("td");
+            $oTblrow->appendChild($oTblcell);
+            $oTblcellElem = $oDom->createElement("a");
+            $oTblcell->appendChild($oTblcellElem);
+            $oTblcellElem->setAttribute('href', 'objectManager.php?sClass=application&iId='.$oRow->appId);
+            $oTblcellElem->nodeValue = $oRow->appName;
+
+            // Adds extra appdb <table> cells to bugz <table>
+            $oTblcell = $oDom->createElement("td");
+            $oTblrow->appendChild($oTblcell);
+            $oTblcellElem = $oDom->createElement("a");
+            $oTblcell->appendChild($oTblcellElem);
+            $oTblcellElem->setAttribute('href', 'objectManager.php?sClass=version&iId='.$oRow->versionId);
+            $oTblcellElem->nodeValue = $oRow->versionName;
+
+            // Adds extra appdb <table> cells to bugz <table>
+            $oTblcell = $oDom->createElement("td");
+            $oTblrow->appendChild($oTblcell);
+            //$oTblcell->nodeValue = $oRow->hasMaintainer == NULL ? "No" : "YES";
+            $oTblcellElem = $oDom->createElement("a");
+            $oTblcell->appendChild($oTblcellElem);
+            //$oTblcellElem->setAttribute('class', "");
+            //$oTblcellElem->setAttribute('href', 'viewbugs.php?iBugId='.$oRow->bug_id);
+            //$oTblcellElem->nodeValue = "View";
+            $oTblcellElemm = $oDom->createElement("i");
+            $oTblcellElem->appendChild($oTblcellElemm);
+            $oTblcellElemm->setAttribute('class', $oRow->hasMaintainer == NULL ? "fa fa-close" : "fa fa-check");
+
+            $oTblcell = $oDom->createElement("td");
+            $oTblrow->appendChild($oTblcell);
+            $oTblcellElem = $oDom->createElement("a");
+            $oTblcell->appendChild($oTblcellElem);
+            $oTblcellElem->setAttribute('class', "btn btn-default");
+            $oTblcellElem->setAttribute('href', 'viewbugs.php?iBugId='.$oRow->bug_id);
+            //$oTblcellElem->nodeValue = "View";
+            $oTblcellElemm = $oDom->createElement("i");
+            $oTblcellElem->appendChild($oTblcellElemm);
+            $oTblcellElemm->setAttribute('class', "fa fa-table");
+
+            $oM = new objectManager("bug");
+            $oVersion = new Version($oRow->versionId);
+
+            if ($bCanEdit)
+            {
+                $oTblcell = $oDom->createElement("td");
+                $oTblrow->appendChild($oTblcell);
+                $oTblcellElem = $oDom->createElement("a");
+                $oTblcell->appendChild($oTblcellElem);
+                $oTblcellElem->setAttribute('href', html_entity_decode($oM->makeUrl("delete", $oRow->linkId)));
+                $oTblcellElem->setAttribute('class', "btn btn-default");
+                $oTblcellElemm = $oDom->createElement("i");
+                $oTblcellElem->appendChild($oTblcellElemm);
+                $oTblcellElemm->setAttribute('class', "fa fa-trash-o");
+
+                $oTblcell = $oDom->createElement("td");
+                $oTblrow->appendChild($oTblcell);
+
+                if ($oRow->state=='queued')
+                {
+                    $oTblcellElem = $oDom->createElement("a");
+                    $oTblcell->appendChild($oTblcellElem);
+                    $oTblcellElem->setAttribute('href', html_entity_decode($oM->makeUrl("edit", $oRow->linkId)));
+                    $oTblcellElem->setAttribute('class', "btn btn-default");
+                    $oTblcellElemm = $oDom->createElement("i");
+                    $oTblcellElem->appendChild($oTblcellElemm);
+                    $oTblcellElemm->setAttribute('class', "fa fa-edit");
+                }
+                else
+                {
+                    //$oTblcell->nodeValue = $oRow->state;
+
+                    $oTblcellElem = $oDom->createElement("a");
+                    $oTblcell->appendChild($oTblcellElem);
+                    //$oTblcellElem->setAttribute('href', html_entity_decode($oM->makeUrl("edit", $oRow->linkId)));
+                    //$oTblcellElem->setAttribute('class', "btn btn-default");
+                    $oTblcellElemm = $oDom->createElement("i");
+                    $oTblcellElem->appendChild($oTblcellElemm);
+                    $oTblcellElemm->setAttribute('class', "fa fa-close");
+                }
+            }
+        }
+
+        // Ouputs html with manual changes above
+        if ($aTbls->count() > 0)
+        {
+            echo $oDom->saveHTML($oTbl);
+        }
     }
 
     // returns a table row
     function objectGetTableRow()
     {
-        $oTableRow = new TableRow();
-        
-        $oVersion = new version($this->iVersionId);
-        $oApp = new application($oVersion->iAppId);
-
-        $oTableCell = new TableCell($this->iBug_id);
-        $oTableCell->SetAlign("center");
-        $oTableCell->SetCellLink(BUGZILLA_ROOT.'show_bug.cgi?id='.$this->iBug_id);
-        $oTableRow->AddCell($oTableCell);
-
-        $oTableCell = new TableCell($this->sBug_status);
-        $oTableCell->SetAlign("center");
-        $oTableRow->AddCell($oTableCell);
-
-        $oTableRow->AddTextCell($this->sShort_desc);
-
-        $oTableRow->AddTextCell($oApp->objectMakeLink());
-
-        $oTableRow->AddTextCell($oVersion->objectMakeLink());
-
-        $oTableRow->AddTextCell($oVersion->hasMaintainer() ? 'YES' : 'No');
-
-        $oOMTableRow = new OMTableRow($oTableRow);
-
-        // enable the deletion link, the objectManager will check
-        // for appropriate permissions before adding the link
-        $oOMTableRow->SetHasDeleteLink(true);
-
-        return $oOMTableRow;
+        // Table handled but objectDrawCustomTable
+        return NULL;
     }
 
     function objectMakeUrl()
@@ -661,20 +860,19 @@ class Bug
 
     function display()
     {
-        $oTable = new Table();
-        $oTable->SetAlign("center");
-        $oTable->SetClass("color0");
-        $oTable->SetCellPadding(2);
+        $sQuery = "SELECT *
+               FROM buglinks
+               LEFT JOIN appVersion
+               ON buglinks.versionId = appVersion.versionId
+               LEFT JOIN appFamily
+               ON appVersion.appId = appFamily.appId
+               WHERE buglinks.linkId = '?'
+               ORDER BY bug_id";
 
-        $oHeaderRow = $this->objectGetHeader();
-        $oHeaderRow->SetClass("color4");
-        $oTable->AddRow($oHeaderRow);
-
-        $oDataRow = $this->objectGetTableRow();
-        $oDataRow->GetTableRow()->SetClass("color0");
-        $oTable->AddRow($oDataRow);
-        
-        echo $oTable->GetString();
+        if($hResult = query_parameters($sQuery, $this->iLinkId))
+        {
+            Bug::objectDrawCustomTable($hResult, false, $canEdit(), array_key_exists('sAllBugs', $aClean));
+        }
     }
 
     function objectHideReject()
@@ -719,58 +917,22 @@ function view_version_bugs($iVersionId = null, $aBuglinkIds)
                  $_SESSION['current']->isSuperMaintainer($oVersion->iAppId)))
     {
         $bCanEdit = TRUE;
-    } 
-    
-    //start format table
-    echo "<table class=\"whq-table whq-table-full\">\n\n";
-    echo "<thead><tr>\n";
-    echo "    <td class=\"text-center\" width=\"80\">Bug #</td>\n";
-    echo "    <td>Description</td>\n";
-    echo "    <td class=\"text-center\" width=\"80\">Status</td>\n";
-    echo "    <td class=\"text-center\" width=\"80\">Resolution</td>\n";
-    echo "    <td class=\"text-center\" width=\"80\">Other apps affected</td>\n";
-
-    if($bCanEdit == true)
-    {
-        echo "    <td class=\"text-center\"width=\"80\">Delete</td>\n";
-        echo "    <td class=\"text-center\"width=\"80\">Checked</td>\n";
-    }
-    echo "</tr></thead><tbody>\n\n";
-
-    foreach($aBuglinkIds as $iBuglinkId)
-    {
-        $oBuglink = new Bug($iBuglinkId);
-
-        if ((!isset($aClean['sAllBugs']) && $oBuglink->isOpen() ) || isset($aClean['sAllBugs']))
-        {
-            //display row
-            echo "<tr>\n";
-            echo "<td class=\"text-center\"><a href=\"".BUGZILLA_ROOT."show_bug.cgi?id={$oBuglink->iBug_id}\"><i class=\"fa fa-bug\"></i> {$oBuglink->iBug_id}</a></td>\n";
-            echo "<td>".$oBuglink->sShort_desc."</td>\n";
-            echo "<td class=\"text-center\">".$oBuglink->sBug_status."</td>","\n";
-            echo "<td class=\"text-center\">".$oBuglink->sResolution."</td>","\n";
-            echo "<td class=\"text-center\"><a href=\"viewbugs.php?iBugId={$oBuglink->iBug_id}\" class=\"btn btn-default\">View</a></td>\n";
-
-            if($bCanEdit == true)
-            {
-                $oM = new objectManager("bug");
-                $oM->setReturnTo($oVersion->objectMakeUrl());
-                echo "<td class=\"text-center\"><a href=\"".$oM->makeUrl("Delete", $oBuglink->iLinkId)."&amp;sSubmit=Delete\" class=\"btn btn-default btn-skinny\"><i class=\"fa fa-trash-o\"></i></a></td>\n";
-                if ($oBuglink->bQueued)
-                {
-                    echo "<td class=\"text-center\"><a href=\"".$oM->makeUrl("edit", $oBuglink->iLinkId)."&amp;sSubmit=Submit&amp;bIsQueue=true\" class=\"btn btn-default btn-skinny\"><i class=\"fa fa-check\"></i></a></td>\n";
-                }
-                else
-                {
-                    echo "<td class=\"text-center\">Yes</td>\n";
-                }
-                
-            }
-            echo "</tr>\n\n";
-        }
     }
 
-    echo '</tbody></table>',"\n";
+    $aBuglinkIds = array();
+    $sQuery = "SELECT *
+               FROM buglinks
+               LEFT JOIN appVersion
+               ON buglinks.versionId = appVersion.versionId
+               LEFT JOIN appFamily
+               ON appVersion.appId = appFamily.appId
+               WHERE buglinks.versionId = '?'
+               ORDER BY bug_id";
+
+    if($hResult = query_parameters($sQuery, $iVersionId))
+    {
+        Bug::objectDrawCustomTable($hResult, false, $bCanEdit, array_key_exists('sAllBugs', $aClean));
+    }
 
     if($_SESSION['current']->isLoggedIn())
     {

@@ -66,7 +66,7 @@ function query_bugzilladb($sQuery, $sComment="")
     if(!is_resource($hBugzillaLink))
     {
         // The last argument makes sure we are really opening a new connection
-        $hBugzillaLink = new mysqli(BUGZILLA_DBHOST, BUGZILLA_DBUSER, BUGZILLA_DBPASS, BUGZILLA_DB);
+        $hBugzillaLink = new mysqli(APPS_DBHOST, APPS_DBUSER, APPS_DBPASS, APPS_DB);
         if(!$hBugzillaLink)
             return;
         // Tell MySQL to return UTF8-encoded results
@@ -157,6 +157,11 @@ function query_fetch_row($hResult)
 function query_fetch_object($hResult)
 {
     return $hResult->fetch_object();
+}
+
+function query_data_seek($hResult, $iOffset)
+{
+    return $hResult->data_seek($iOffset);
 }
 
 function query_appdb_insert_id()

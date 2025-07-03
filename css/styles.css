@@ -636,7 +636,7 @@ table {
     border-spacing: 0.25em;
     border-collapse: separate;
 }
-table td {
+table td, table th {
     padding: 0.25em;
 }
 
@@ -651,7 +651,7 @@ table.whq-table-full {
 table.winehq td {
     padding: 0.25em;
 }
-table.whq-table thead tr td {
+table.whq-table thead tr td, table.whq-table thead tr th {
     background-color: #95493A;
     border: 1px solid #732010;
     font-weight: bold;
@@ -660,10 +660,10 @@ table.whq-table thead tr td {
 table.whq-table thead tr td a {
     color: #ffffff;
 }
-table.whq-table thead tr td:first-child {
+table.whq-table thead tr td:first-child, table.whq-table thead tr th:first-child {
     border-top-left-radius: 5px;
 }
-table.whq-table thead tr td:last-child {
+table.whq-table thead tr td:last-child, table.whq-table thead tr th:last-child {
     border-top-right-radius: 5px;
 }
 table.whq-table tbody tr td {

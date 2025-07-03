@@ -26,7 +26,7 @@ function global_admin_menu() {
             'Test%20Results%20Queue');
     $g->add("Bug Link Queue (".bug::objectGetEntriesCount('queued').")",
             BASE.'objectManager.php?sClass=bug&amp;sState=queued&amp;sTitle='.
-            'Bug%20Link%20Queue');
+            'Bug%20Link%20Queue&amp;sAllBugs');
 
     $g->addmisc("&nbsp;");
 
@@ -34,7 +34,7 @@ function global_admin_menu() {
             BASE."objectManager.php?sClass=maintainerView&sTitle=View+Maintainers");
     $g->add("Bug Links (".bug::objectGetEntriesCount('accepted').")",
             BASE."objectManager.php?sClass=bug&amp;sTitle=".
-            "Bug%20Links");
+            "Bug%20Links&amp;sAllBugs");
     $g->add("Test Results (".testData::objectGetEntriesCount('accepted').")",
             BASE."objectManager.php?sClass=testData&amp;sTitle=".
             "View%20Test%20Results");
