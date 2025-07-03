@@ -95,6 +95,10 @@ function filter_gpc()
                 if(is_array($_REQUEST[$aKeys[$i]]))
                     $aClean[$aKeys[$i]] = $_REQUEST[$aKeys[$i]];
             break;
+            case "sAllBugs": // array
+                // store the value if it is an array
+                $aClean[$aKeys[$i]] = "true";
+            break;
             default:
                 // type not recognized, skip it
                 break;

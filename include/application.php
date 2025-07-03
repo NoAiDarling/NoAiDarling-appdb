@@ -1024,15 +1024,6 @@ EOT;
             $sExtraTables = ",appVersion";
             $sBugzillaQuery = '';
 
-            /* We only query the bugzilla table when necessary; these queries
-               will hide apps without test results */
-            if(strstr($sWhereFilter, 'versions.id'))
-            {
-                $sExtraTables .= ','.BUGZILLA_DB.'.versions';
-                $sBugzillaQuery = ' AND versions.value = appVersion.ratingRelease
-                                    AND versions.product_id = '.BUGZILLA_PRODUCT_ID.' ';
-            }
-
             if($sWhereFilter)
                 $sWhereFilter = " AND $sWhereFilter";
             $sWhereFilter = " AND appVersion.state = 'accepted'
@@ -1277,15 +1268,6 @@ EOT;
             $sExtraTables = ',appVersion';
             $sBugzillaQuery = '';
 
-            /* We only query the bugzilla table when necessary; these queries
-               will hide apps without test results */
-            if(strstr($sWhereFilter, 'versions.id'))
-            {
-                $sExtraTables .= ','.BUGZILLA_DB.'.versions';
-                $sBugzillaQuery = ' AND versions.value = appVersion.ratingRelease
-                                    AND versions.product_id = '.BUGZILLA_PRODUCT_ID.' ';
-            }
-
             if($sWhereFilter)
                 $sWhereFilter = " AND $sWhereFilter";
             $sWhereFilter = " AND appVersion.appId = appFamily.appId
@@ -1344,7 +1326,6 @@ EOT;
 
         while($oRow = query_fetch_object($hResult))
             $aVersions[] = new version($oRow->versionId);
-
         return $aVersions;
     }
 

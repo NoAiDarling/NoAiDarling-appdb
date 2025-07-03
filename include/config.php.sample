@@ -61,9 +61,5 @@ define("APPS_DB","");
 /*
  * bugzilla database info
  */
-define("BUGZILLA_DBUSER","");
-define("BUGZILLA_DBPASS","");
-define("BUGZILLA_DBHOST","");
-define("BUGZILLA_DB","");
 define("BUGZILLA_PRODUCT_ID","1");
 ?>
