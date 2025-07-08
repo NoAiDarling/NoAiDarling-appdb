@@ -780,7 +780,7 @@ class ObjectManager
         $iDeleted = 0;
         $iFailed = 0;
 
-        if($sSubmittedBefore)
+        if($iSubmittedBefore)
             $sMailWord = "old";
         else
             $sMailWord = "all";
