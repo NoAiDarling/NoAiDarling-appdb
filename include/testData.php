@@ -693,20 +693,15 @@ class testData{
         $bShowAll = (getInput('bShowAll', $aClean) == 'true') ? true : false;
 
         $sQuery = "SELECT *
-                   FROM testResults, ?.versions
-                   WHERE versionId = '?'
-                   AND
-                   versions.value = testResults.testedRelease
-                   AND
-                   versions.product_id = '?'
-                   AND
-                   state = '?'
-                   ORDER BY versions.id DESC,testedDate DESC";
+                   FROM testResults
+                   WHERE state = '?'
+                   AND versionId = '?'
+                   ORDER BY testedDate DESC";
 
         if(!$bShowAll)
             $sQuery.=" LIMIT 0,".$iDisplayLimit;
 
-        $hResult = query_parameters($sQuery, APP_DB, $this->iVersionId, BUGZILLA_PRODUCT_ID, 'accepted');
+        $hResult = query_parameters($sQuery, 'accepted', $this->iVersionId);
         if(!$hResult)
             return;
 
@@ -798,17 +793,13 @@ class testData{
     /* retrieve the latest test result for a given version id */
     public static function getNewestTestIdFromVersionId($iVersionId, $sState = 'accepted')
     {
-        $sQuery = "SELECT testingId FROM testResults, ?.versions WHERE
-                versions.value = testResults.testedRelease
-                AND
-                versions.product_id = '?'
-                AND
-                versionId = '?'
-                AND
-                state = '?'
-                     ORDER BY versions.id DESC,testedDate DESC limit 1";
+        $sQuery = "SELECT testingId
+                   FROM testResults
+                   WHERE state = '?'
+                   AND versionId = '?'
+                     ORDER BY testedDate DESC limit 1";
 
-        $hResult = query_parameters($sQuery, APPS_DB, BUGZILLA_PRODUCT_ID, $iVersionId, $sState);
+        $hResult = query_parameters($sQuery, $sState, $iVersionId);
 
         if(!$hResult)
             return 0;

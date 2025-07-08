@@ -148,29 +148,26 @@ function htmlify_urls($text)
 // If bReturnIds is true, version ids are returned instead of names
 function get_bugzilla_versions($bReturnIds = false)
 {
-    $sFetchColumn = $bReturnIds ? 'id' : 'value';
-    $aVersions = array();
-    $sTable = ".versions";
-
-    // The empty string will fetch the most recent versions
-    $aBranches = array('');
-
-    foreach($aBranches as $sBranch)
+    // Stores buzilla versions retrieved via HTTP per user session
+    if(!$_SESSION["bugzilla_versions"])
     {
-        $sWhere = "WHERE product_id =".BUGZILLA_PRODUCT_ID." AND value LIKE '$sBranch%'";
-        $sQuery = "SELECT $sFetchColumn FROM $sTable $sWhere ORDER BY id desc limit 10";
-        $hResult = query_bugzilladb($sQuery);
-        if($hResult)
-        {
-            while(list($sValue) = query_fetch_row($hResult))
-            {
-                if(!in_array($sValue, $aVersions))
-                    $aVersions[] = $sValue;
-            }
+        $oDom = new DOMDocument('1.0', 'utf-8');
+        $sBugsSearchUrl = "https://bugs.winehq.org/query.cgi?format=advanced";
+        $sHtml = file_get_contents($sBugsSearchUrl);
+        $oDom->loadHTML($sHtml);
+
+        // Parses html for <select> <option id="*_version"> containing bugzilla wine versions
+        $oXpath = new DomXPath($oDom);
+        $aSelectoptions = $oXpath->query("//option[contains(@id, '_version')]");
+        foreach ($aSelectoptions as $oSelectoption) {
+            $id = $oSelectoption->getAttribute("id");
+
+            $pos = strpos($id, "_version");
+            $id = substr($id, 1, $pos - 1);
+            $_SESSION["bugzilla_versions"][] = $oSelectoption->textContent;
         }
     }
-
-    return $aVersions;
+    return $_SESSION["bugzilla_versions"];
 }
 
 // Returns an array containing the IDs of the Wine versions stored in Bugzilla
