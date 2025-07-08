@@ -307,54 +307,23 @@ class Bug
     /* Get a list of bugs submitted by a given user */
     public static function listSubmittedBy($iUserId, $bQueued = true)
     {
-        $hResult = query_parameters("SELECT appFamily.appName, buglinks.versionId, appVersion.versionName, buglinks.submitTime, buglinks.bug_id, buglinks.linkId FROM buglinks, appFamily, appVersion WHERE appFamily.appId = appVersion.appId AND buglinks.versionId = appVersion.versionId AND buglinks.state = '?' AND buglinks.submitterId = '?' ORDER BY buglinks.versionId", $bQueued ? 'queued' : 'accepted', $iUserId);
+        global $aClean;
+
+        $sQuery = "SELECT buglinks.*, appFamily.appName, appVersion.versionName
+                 FROM buglinks
+                 LEFT JOIN appVersion
+                 ON buglinks.versionId = appVersion.versionId
+                 LEFT JOIN appFamily
+                 ON appVersion.appId = appFamily.appId
+                 WHERE buglinks.state = '?'
+                 AND buglinks.submitterId = '?'
+                 ORDER BY buglinks.versionId";
+        $hResult = query_parameters($sQuery, $bQueued ? 'queued' : 'accepted', $iUserId);
 
         if(!$hResult || !query_num_rows($hResult))
             return FALSE;
 
-        $oTable = new Table();
-        $oTable->SetWidth("100%");
-        $oTable->SetAlign("center");
-
-        // setup the table header
-        $oTableRow = new TableRow();
-        $oTableRow->AddTextCell('Version');
-        $oTableRow->AddTextCell('Bug #', 'width="50"');
-        $oTableRow->AddTextCell('Status', 'width="80"');
-        $oTableRow->AddTextCell('Resolution', 'width="110"');
-        $oTableRow->AddTextCell('Description', 'Submit time');
-        $oTableRow->AddTextCell('Submit time');
-
-        if($bQueued)
-            $oTableRow->addTextCell('Action');
-
-        $oTableRow->SetClass('color4');
-        $oTable->AddRow($oTableRow);
-
-        for($i = 1; $oRow = query_fetch_object($hResult); $i++)
-        {
-            $oTableRow = new TableRow();
-
-            $oTableRow->AddTextCell(version::fullNameLink($oRow->versionId));
-            $oTableRow->AddTextCell('<a href="'.BUGZILLA_ROOT.'show_bug.cgi?id='.$oRow->bug_id.'">'.$oRow->bug_id.'</a>');
-            $oTableRow->AddTextCell($oBug->sBug_status);
-            $oTableRow->AddTextCell($oBug->sResolution);
-            $oTableRow->AddTextCell($oBug->sShort_desc);
-            $oTableRow->AddTextCell(print_date(mysqldatetime_to_unixtimestamp($oRow->submitTime)));
-
-            if($bQueued)
-            {
-                $oM = new objectManager('bug');
-                $oM->setReturnTo(array_key_exists('REQUEST_URI', $_SERVER) ? $_SERVER['REQUEST_URI'] : "");
-                $shDeleteLink = '<a href="'.$oM->makeUrl('delete', $oRow->linkId, 'Delete entry').'">delete</a>';
-                $oTableRow->addTextCell(" [ $shDeleteLink ]");
-            }
-
-            $oTableRow->SetClass(($i % 2 ) ? 'color0' : 'color1');
-            $oTable->AddRow($oTableRow);
-        }
-
-        return $oTable->GetString();
+        return $hResult;
     }
 
     function isOpen()
@@ -463,7 +432,7 @@ class Bug
                                         $sState, $iStart, $iRows);
         } else
         {
-            $sQuery = "SELECT *
+            $sQuery = "SELECT buglinks.*, appFamily.appName, appVersion.versionName
                  FROM buglinks
                  LEFT JOIN appVersion
                  ON buglinks.versionId = appVersion.versionId
@@ -553,19 +522,17 @@ class Bug
 
     function objectWantCustomDraw($sWhat, $sQueued)
     {
-        //return false;
         switch($sWhat)
         {
             case 'table':
-                if($sQueued == 'false')
-                    return true;
+                return true;
                 break;
         }
 
         return false;
     }
 
-     public static function objectDrawCustomTable($hResult, $sQueued, $bCanEdit=false, $sAllBugs=true)
+    public static function objectDrawCustomTable($hResult, $sQueued, $bCanEdit=false, $sAllBugs=true)
     {
         // Adds bug ids to Bugzilla url search params
         $sBugIds = "";
@@ -757,6 +724,7 @@ class Bug
             $oTblcellElemm->setAttribute('class', "fa fa-table");
 
             $oM = new objectManager("bug");
+            $oM->setReturnTo(array_key_exists('REQUEST_URI', $_SERVER) ? $_SERVER['REQUEST_URI'] : "");
             $oVersion = new Version($oRow->versionId);
 
             if ($bCanEdit)
@@ -778,7 +746,7 @@ class Bug
                 {
                     $oTblcellElem = $oDom->createElement("a");
                     $oTblcell->appendChild($oTblcellElem);
-                    $oTblcellElem->setAttribute('href', html_entity_decode($oM->makeUrl("edit", $oRow->linkId)));
+                    $oTblcellElem->setAttribute('href', html_entity_decode($oM->makeUrl("edit", $oRow->linkId))."&sAllBugs&sState=queued");
                     $oTblcellElem->setAttribute('class', "btn btn-default");
                     $oTblcellElemm = $oDom->createElement("i");
                     $oTblcellElem->appendChild($oTblcellElemm);
@@ -860,7 +828,8 @@ class Bug
 
     function display()
     {
-        $sQuery = "SELECT *
+        global $aClean;
+        $sQuery = "SELECT buglinks.*, appFamily.appName, appVersion.versionName
                FROM buglinks
                LEFT JOIN appVersion
                ON buglinks.versionId = appVersion.versionId
@@ -871,7 +840,7 @@ class Bug
 
         if($hResult = query_parameters($sQuery, $this->iLinkId))
         {
-            Bug::objectDrawCustomTable($hResult, false, $canEdit(), array_key_exists('sAllBugs', $aClean));
+            Bug::objectDrawCustomTable($hResult, false, $this->canEdit(), array_key_exists('sAllBugs', $aClean));
         }
     }
 
