@@ -137,7 +137,7 @@ function cmd_do_new()
         addmsg("An account with this e-mail exists already.", "red");
         retry("new", "Failed to create account");
     }
-    else if($iResult = USER_CREATE_FAILED)
+    else if($iResult == USER_CREATE_FAILED)
     {
         addmsg("Error while creating a new user.", "red");
         retry("new", "Failed to create account");
