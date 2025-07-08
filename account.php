@@ -10,7 +10,6 @@
  *  - sUserPassword2, new password confirmation
  *  - sUserEmail, e-mail address
  *  - sUserRealname, user's real name
- *  - sWineRelease, user's Wine release
  *
  * TODO:
  *  - replace sCmd with iAction and replace "new", "login", etc. with integer constants NEW, LOGIN, etc.
@@ -122,8 +121,8 @@ function cmd_do_new()
 
     $oUser = new User();
     $sPassword =  substr(base_convert(rand(0, PHP_INT_MAX),10, 36), 0, 9);
-    $iResult = $oUser->create($aClean['sUserEmail'], $sPassword,
-                              $aClean['sUserRealname'], $aClean['sWineRelease'] );
+	
+    $iResult = $oUser->create($aClean['sUserEmail'], $sPassword, $aClean['sUserRealname']);
 
     if($iResult == SUCCESS)
     {

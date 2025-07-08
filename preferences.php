@@ -10,7 +10,6 @@
  *  - sUserPassword2, new password confirmation
  *  - sUserEmail, e-mail address
  *  - sUserRealname, user's real name
- *  - sWineRelease, user's Wine release
  *  - bIsAdmin, true if user is an administrator
  *
  * TODO:
@@ -64,7 +63,6 @@ if(isset($aClean['sSubmit']) && $aClean['sSubmit'] == "Update")
     /* update user data fields */
     $oUser->sEmail = $aClean['sUserEmail'];
     $oUser->sRealname = $aClean['sUserRealname'];
-    $oUser->sWineRelease = $aClean['sWineRelease'];
 
     /* if the password was empty in both cases then skip updating the users password */
     if($str_passwd != "")
@@ -144,21 +142,6 @@ if($_SESSION['current']->hasPriv("admin"))
                           "$sAdminChecked>");
 
     $aTableRows[] = $oTableRow;
-}
-
-// wine version
-$oTableRow = new TableRow();
-$oTableRow->AddTextCell("&nbsp; Wine version");
-$sBugzillaVersionList = make_bugzilla_version_list("sWineRelease",
-                                                   $oUser->sWineRelease);
-if (!empty($sBugzillaVersionList))
-{
-    $oTableRow->AddCell(new TableCell($sBugzillaVersionList));
-    $aTableRows[] = $oTableRow;
-}
-foreach($aTableRows as $oTableRow)
-{
-     $oTable->AddRow($oTableRow);
 }
 
 // user preferences - only editable by user, not admin

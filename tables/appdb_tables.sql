@@ -411,7 +411,6 @@ CREATE TABLE `user_list` (
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `inactivity_warn_stamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `inactivity_warned` enum('true','false') NOT NULL DEFAULT 'false',
-  `CVSrelease` text DEFAULT NULL,
   UNIQUE KEY `userid` (`userid`),
   KEY `stamp` (`stamp`),
   KEY `realname` (`realname`(3072)),

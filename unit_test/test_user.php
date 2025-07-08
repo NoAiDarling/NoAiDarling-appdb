@@ -94,7 +94,6 @@ function test_user_update_set_test($realname, $winerelease)
 
     /* modify the users realname and wine release */
     $oUser->sRealname = $realname;
-    $oUser->sWineRelease = $winerelease;
     $oUser->update(); /* save the changes */
 
     /* log the user in again */
@@ -110,12 +109,6 @@ function test_user_update_set_test($realname, $winerelease)
     if($oUser->sRealname != $realname)
     {
         echo "Realname of '".$oUser->sRealname."' doesn't match expected realname of '".$realname."'\n";
-        return false;
-    }
-
-    if($oUser->sWineRelease != $winerelease)
-    {
-        echo "Wine release of '".$oUser->sWineRelease."' doesn't match expected wine release of '".$winerelease."'\n";
         return false;
     }
 

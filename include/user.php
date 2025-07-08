@@ -24,7 +24,6 @@ class User {
     var $sRealname;
     var $sStamp;
     var $sDateCreated;
-    var $sWineRelease;
     var $bInactivityWarned;
 
     /**
@@ -48,7 +47,6 @@ class User {
                 $this->sRealname = $oRow->realname;
                 $this->sStamp = $oRow->stamp;
                 $this->sDateCreated = $oRow->created;
-                $this->sWineRelease = $oRow->CVSrelease;
                 $this->bInactivityWarned = $oRow->inactivity_warned;
             }
         }
@@ -119,7 +117,6 @@ class User {
             $this->sRealname = $oRow->realname;
             $this->sStamp = $oRow->stamp;
             $this->sDateCreated = $oRow->created;
-            $this->sWineRelease = $oRow->CVSrelease;
 
             // if we used an old style password, update the users password
             if($bUsedOldStylePassword)
@@ -157,16 +154,16 @@ class User {
      * Creates a new user.
      * returns SUCCESS on success, USER_CREATE_EXISTS if the user already exists
      */
-    function create($sEmail, $sPassword, $sRealname, $sWineRelease)
+    function create($sEmail, $sPassword, $sRealname)
     {
         if(User::exists($sEmail))
         {
             return USER_CREATE_EXISTS;
         } else
         {
-            $hResult = query_parameters("INSERT INTO user_list (realname, email, CVSrelease, password, stamp,".
-                                        "created) VALUES ('?', '?', '?', SHA1('?'), ?, ?)",
-                                        $sRealname, $sEmail, $sWineRelease, $sPassword, "NOW()", "NOW()");
+            $hResult = query_parameters("INSERT INTO user_list (realname, email, password, stamp,".
+                                        "created) VALUES ('?', '?', SHA1('?'), NOW(), NOW())",
+                                        $sRealname, $sEmail, $sPassword);
 
             if(!$hResult) return USER_CREATE_FAILED;
 
@@ -207,13 +204,6 @@ class User {
         {
             if (!query_parameters("UPDATE user_list SET realname = '?' WHERE userid = '?'",
                              $this->sRealname, $this->iUserId))
-                return USER_UPDATE_FAILED;
-        }
-
-        if ($this->sWineRelease && ($this->sWineRelease != $oUser->sWineRelease))
-        {
-            if (!query_parameters("UPDATE user_list SET CVSrelease = '?' WHERE userid = '?'",
-                                  $this->sWineRelease, $this->iUserId))
                 return USER_UPDATE_FAILED;
         }
 

@@ -5,7 +5,6 @@
 
 global $aClean;
 
-$sWineList = make_bugzilla_version_list("sWineRelease", isset($aClean['sWineRelease']) ? $aClean['sWineRelease'] : '');
 $sUserEmail = (!empty($aClean['sUserEmail']) ? $aClean['sUserEmail'] : '');
 $sUserRealname = (!empty($aClean['sUserRealname']) ? $aClean['sUserRealname'] : '');
 $sReturnTo = (!empty($aClean['sReturnTo']) ? $aClean['sReturnTo'] : '');
@@ -25,12 +24,6 @@ $sReturnTo = (!empty($aClean['sReturnTo']) ? $aClean['sReturnTo'] : '');
     <label class="col-sm-2 control-label">Real Name</label>
     <div class="col-sm-10">
         <input type="text" name="sUserRealname" value='<?php echo $sUserRealname ?>' class="form-control">
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-sm-2 control-label">Wine Version</label>
-    <div class="col-sm-10">
-        <?php echo $sWineList; ?>
     </div>
 </div>
 <div class="form-group">
