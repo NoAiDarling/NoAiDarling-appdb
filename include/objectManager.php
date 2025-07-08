@@ -420,7 +420,7 @@ class ObjectManager
             echo "<table width='100%' border=0 cellpadding=2 cellspacing=0>\n";
             echo '<tr valign=top><td class="color0"><b>E-mail Text</b></td>',"\n";
             echo '<td><textarea name="sReplyText" style="width: 100%" cols="80" '.
-                'rows="10">'.$sDefaultReply.'</textarea></td></tr>',"\n";
+                'rows="10" placeholder="'.$sDefaultReply.'"></textarea></td></tr>',"\n";
         }
         if($this->getIsQueue())
         {
