@@ -889,7 +889,7 @@ function view_version_bugs($iVersionId = null, $aBuglinkIds)
     }
 
     $aBuglinkIds = array();
-    $sQuery = "SELECT *
+    $sQuery = "SELECT buglinks.*, appFamily.appName, appVersion.versionName
                FROM buglinks
                LEFT JOIN appVersion
                ON buglinks.versionId = appVersion.versionId
