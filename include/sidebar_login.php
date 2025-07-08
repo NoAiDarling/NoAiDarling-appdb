@@ -87,7 +87,7 @@ function global_sidebar_login() {
         if(!$_SESSION['current']->hasPriv("admin"))
         {
             $g->addmisc("");
-            $g->add("Your queued items", BASE."queueditems.php");
+            $g->add("Your queued items", BASE."queueditems.php?sAllBugs");
         }
 
     } else

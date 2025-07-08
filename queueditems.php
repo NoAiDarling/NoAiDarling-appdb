@@ -49,8 +49,10 @@ if($sResult = Version::listSubmittedBy($oUser->iUserId))
 /* Bug links */
 if($sResult = bug::listSubmittedBy($oUser->iUserId))
 {
+    global $aClean;
     echo html_frame_start("Your Queued Bug Links","90%");
-    echo $sResult;
+    $bCanEdit = TRUE;
+    Bug::objectDrawCustomTable($sResult, false, $bCanEdit, array_key_exists('sAllBugs', $aClean));
     echo html_frame_end("&nbsp;");
 } else
     echo "You have no queued bugs.<br><br>\n";
