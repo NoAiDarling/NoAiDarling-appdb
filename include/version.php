@@ -1188,17 +1188,16 @@ EOT;
         echo '</a>';
         echo '<div id="comments" class="panel-collapse collapse">';
         echo '<div class="panel-body">';
-        if((sizeof($aMaintainers)>0) || ($_SESSION['current']->hasPriv("admin")))
-        {
-            if($this->iVersionId)
-                Comment::view_app_comments($this->iVersionId);
-        }
-        else
+
+        if (sizeof($aMaintainers)==0)
         {
             echo html_note('<i class="fa fa-exclamation-circle"></i> <b>Comments Disabled</b><br><br> '.
                            'Comments for this application have been disabled because there are no maintainers.',
                            "","","warning");
         }
+        if($this->iVersionId)
+            Comment::view_app_comments($this->iVersionId, false, (sizeof($aMaintainers)>0));
+
         echo '</div></div></div>';
     }
 

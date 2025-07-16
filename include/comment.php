@@ -226,27 +226,27 @@ class Comment {
     /**
      * Displays the body of one comment.
      */
-    public static function view_comment_body($iCommentId, $bShowAppName = false, $bShowForm = true)
+    public static function view_comment_body($iCommentId, $bShowAppName = false, $bShowForm = true, $bHasMaintainer = false)
     {
         $hResult = Comment::grab_comment($iCommentId);
 
         if ($hResult)
         {
             $oRow = query_fetch_object($hResult);
-            Comment::view_app_comment($oRow, $bShowAppName, $bShowForm);
+            Comment::view_app_comment($oRow, $bShowAppName, $bShowForm, $bHasMaintainer);
         }
     }
 
     /**
      * display a single comment (in $oRow)
      */
-    public static function view_app_comment($oRow, $bShowAppName = false, $bShowForm = true)
+    public static function view_app_comment($oRow, $bShowAppName = false, $bShowForm = true, $bHasMaintainer = false)
     {
         $oComment = new comment(null, $oRow);
-        $oComment->output_comment($bShowAppName, $bShowForm);
+        $oComment->output_comment($bShowAppName, $bShowForm, $bHasMaintainer);
     }
 
-    private function output_comment($bShowAppName = false, $bShowForm = true)
+    private function output_comment($bShowAppName = false, $bShowForm = true, $bHasMaintainer = false)
     {
         // by line
         $sBy = " by <i>".forum_lookup_user($this->oOwner->iUserId)."</i> on <i>".$this->sDateCreated."</i><br>\n";
@@ -261,14 +261,17 @@ class Comment {
         $sFooter = "";
         if ($bShowForm)
         {
-            // reply post buttons
-            $oVersion = new version($this->iVersionId);
-            $oM = new objectManager("comment", "Post new comment");
-            $oM->setReturnTo($oVersion->objectMakeUrl());
-            $sFooter = " <a href=\"".$oM->makeUrl("add")."&iVersionId={$this->iVersionId}\" class=\"btn btn-default btn-xs\">".
-                       "<i class=\"fa fa-comment\"></i> Comment</a> \n".
-                       "<a href=\"".$oM->makeUrl("add")."&iVersionId={$this->iVersionId}&iThread={$this->iCommentId}\" class=\"btn btn-default btn-xs\">".
-                       "<i class=\"fa fa-reply\"></i> Reply</a> ";
+            if ($bHasMaintainer)
+            {
+                // reply post buttons
+                $oVersion = new version($this->iVersionId);
+                $oM = new objectManager("comment", "Post new comment");
+                $oM->setReturnTo($oVersion->objectMakeUrl());
+                $sFooter = " <a href=\"".$oM->makeUrl("add")."&iVersionId={$this->iVersionId}\" class=\"btn btn-default btn-xs\">".
+                    "<i class=\"fa fa-comment\"></i> Comment</a> \n".
+                    "<a href=\"".$oM->makeUrl("add")."&iVersionId={$this->iVersionId}&iThread={$this->iCommentId}\" class=\"btn btn-default btn-xs\">".
+                    "<i class=\"fa fa-reply\"></i> Reply</a> ";
+            }
 
             // delete message button, for admins
             if ($this->canEdit())
@@ -692,7 +695,7 @@ class Comment {
         Comment::do_display_comments_flat($hResult);
     }
 
-    public static function view_app_comments($versionId, $threadId = 0)
+    public static function view_app_comments($versionId, $threadId = 0, $bHasMaintainer = false)
     {
         global $aClean;
 
@@ -721,15 +724,18 @@ class Comment {
             echo '</form>',"\n";
         }
 
-        $oM = new objectManager("comment", "Add comment");
-        $oM->setReturnTo($oVersion->objectMakeUrl());
+        if ($_SESSION['current']->isLoggedIn() && $bHasMaintainer)
+        {
+            $oM = new objectManager("comment", "Add comment");
+            $oM->setReturnTo($oVersion->objectMakeUrl());
+            // post new message button
+            echo '<form method="post" name="sMessage" action="objectManager.php">';
+            echo '<input type="hidden" name="sAction" value="add">';
+            echo $oM->makeUrlFormData();
+            echo '<button type="submit" class="btn btn-default"><i class="fa fa-comment"></i> Post new comment..</button> ',"\n";
+            echo '<input type="hidden" name="iVersionId" value="'.$versionId.'"></form>',"\n";
+        }
 
-        // post new message button
-        echo '<form method="post" name="sMessage" action="objectManager.php">';
-        echo '<input type="hidden" name="sAction" value="add">';
-        echo $oM->makeUrlFormData();
-        echo '<button type="submit" class="btn btn-default"><i class="fa fa-comment"></i> Post new comment</button> ',"\n";
-        echo '<input type="hidden" name="iVersionId" value="'.$versionId.'"></form>',"\n";
 
         if( $messageCount > 0 )
         {
