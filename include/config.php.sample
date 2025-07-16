@@ -48,6 +48,11 @@ define("TESTDATA_AGED_THRESHOLD", 175);
  * session server (redis url)
  */
 define("APPDB_SESSION_SERVER", "tcp://127.0.0.1:6379?&database=2");
+define("APPDB_SESSION_PROTO", "tcp");
+define("APPDB_SESSION_HOST", "127.0.0.1");
+define("APPDB_SESSION_PORT", 6379);
+define("APPDB_SESSION_PASS", "");
+define("APPDB_SESSION_DB", 2);
 
 /*
  * apps database info

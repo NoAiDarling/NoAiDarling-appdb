@@ -142,14 +142,37 @@ function htmlify_urls($text)
 }
 
 
+
+
 /* bugzilla functions */
 
+require_once 'vendor/autoload.php';
+use Predis\Client as PredisClient;
+define('REDIS_BUGZ_STAMP', 'REDIS_BUGZ_STAMP');
+define('REDIS_BUGZ_VERSIONS', 'REDIS_BUGZ_VERSIONS');
 // Returns an array containg the Wine versions stored in our Bugzilla DB
 // If bReturnIds is true, version ids are returned instead of names
 function get_bugzilla_versions($bReturnIds = false)
 {
-    // Stores buzilla versions retrieved via HTTP per user session
-    if(!$_SESSION["bugzilla_versions"])
+    $redis = new PredisClient([
+        'scheme'   => APPDB_SESSION_PROTO,
+        'host'     => APPDB_SESSION_HOST,
+        'port'     => APPDB_SESSION_PORT,
+        'password' => APPDB_SESSION_PASS,
+        'database' => APPDB_SESSION_DB,
+    ]);
+
+    $next_update_stamp = -1;
+
+    // Retreieve previous update stamp rom redis to check if time to update
+    if ($redis->get(REDIS_BUGZ_STAMP) != null)
+    {
+        //$next_update_stamp = strtotime('+10 seconds', $redis->get(REDIS_BUGZ_STAMP));
+        $next_update_stamp = strtotime('+24 hours', $redis->get(REDIS_BUGZ_STAMP));
+    }
+
+    // If time to update versions from Bugzilla then do so and store latest list via redis
+    if ($redis->get(REDIS_BUGZ_STAMP) == null || time() > $next_update_stamp)
     {
         $oDom = new DOMDocument('1.0', 'utf-8');
         $sBugsSearchUrl = "https://bugs.winehq.org/query.cgi?format=advanced";
@@ -159,15 +182,16 @@ function get_bugzilla_versions($bReturnIds = false)
         // Parses html for <select> <option id="*_version"> containing bugzilla wine versions
         $oXpath = new DomXPath($oDom);
         $aSelectoptions = $oXpath->query("//option[contains(@id, '_version')]");
+        $redis->del(REDIS_BUGZ_VERSIONS);
         foreach ($aSelectoptions as $oSelectoption) {
-            $id = $oSelectoption->getAttribute("id");
-
-            $pos = strpos($id, "_version");
-            $id = substr($id, 1, $pos - 1);
-            $_SESSION["bugzilla_versions"][] = $oSelectoption->textContent;
+            $redis->rPush(REDIS_BUGZ_VERSIONS, $oSelectoption->textContent);
         }
+
+        // Update latest redis bugzilla version update timestamp 
+        $redis->set(REDIS_BUGZ_STAMP, time());
     }
-    return $_SESSION["bugzilla_versions"];
+
+    return $redis->lRange(REDIS_BUGZ_VERSIONS, 0, -1);
 }
 
 // Returns an array containing the IDs of the Wine versions stored in Bugzilla
