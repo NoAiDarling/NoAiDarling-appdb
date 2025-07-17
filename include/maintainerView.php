@@ -236,16 +236,18 @@ class maintainerView
             $oTest = $aTestData[0];
             $sUserRating = $oTest->sTestedRating;
             $sUserRelease = $oTest->sTestedRelease;
+            $iUserStaging = $oTest->iStaging;
         } else
         {
             $sUserRating = '';
             $sUserRelease = '';
+            $iUserStaging = 0;
         }
 
         $oTableCell = new TableCell($sUserRating);
         $oTableCell->SetClass($sUserRating);
         $oTableRow->AddCell($oTableCell);
-        $oTableCell = new TableCell($sUserRelease);
+        $oTableCell = new TableCell($sUserRelease.($iUserStaging != 0 ? '-staging':''));
         $oTableCell->SetClass($sUserRating);
         $oTableRow->AddCell($oTableCell);
 
