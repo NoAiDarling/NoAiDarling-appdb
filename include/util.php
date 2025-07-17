@@ -142,11 +142,10 @@ function htmlify_urls($text)
 }
 
 
-
-
 /* bugzilla functions */
 
-require_once 'vendor/autoload.php';
+require 'Predis/Autoloader.php';
+Predis\Autoloader::register();
 use Predis\Client as PredisClient;
 define('REDIS_BUGZ_STAMP', 'REDIS_BUGZ_STAMP');
 define('REDIS_BUGZ_VERSIONS', 'REDIS_BUGZ_VERSIONS');
