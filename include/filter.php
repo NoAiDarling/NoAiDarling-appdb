@@ -38,7 +38,8 @@ function filter_gpc()
         if(($aKeys[$i] == "cx")  ||  // google custom search variable
            ($aKeys[$i] == "cof") ||  // google custom search variable
            ($aKeys[$i] == "q")   ||  // google custom search variable
-           ($aKeys[$i] == "g-recaptcha-response")) // google reCaptcha variable
+           ($aKeys[$i] == "g-recaptcha-response") || // google reCaptcha variable
+           ($aKeys[$i] == "fbclid" )) // Facebook link tracking
         {
             // copy the key over to the clean array
             // NOTE: we do not strip html tags or trim any Xinha variables
