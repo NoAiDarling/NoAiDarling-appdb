@@ -11,6 +11,7 @@ Requirements:
  * PHP-GD
  * PHP-Mail
  * PHP-Mail-Mime
+ * PHP-Predis
 
 Reccommended:
  * Apache 2.4+
