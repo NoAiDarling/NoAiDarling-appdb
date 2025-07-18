@@ -261,10 +261,10 @@ class Comment {
         $sFooter = "";
         if ($bShowForm)
         {
+            $oVersion = new version($this->iVersionId);
             if ($bHasMaintainer)
             {
                 // reply post buttons
-                $oVersion = new version($this->iVersionId);
                 $oM = new objectManager("comment", "Post new comment");
                 $oM->setReturnTo($oVersion->objectMakeUrl());
                 $sFooter = " <a href=\"".$oM->makeUrl("add")."&iVersionId={$this->iVersionId}\" class=\"btn btn-default btn-xs\">".
