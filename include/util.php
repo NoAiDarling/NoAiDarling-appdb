@@ -149,7 +149,7 @@ Predis\Autoloader::register();
 use Predis\Client as PredisClient;
 define('REDIS_BUGZ_STAMP', 'REDIS_BUGZ_STAMP');
 define('REDIS_BUGZ_VERSIONS', 'REDIS_BUGZ_VERSIONS');
-define('BUGZ_VERSION_LIM', 100);
+define('BUGZ_VERSION_LIM', 25);
 // Returns an array containg the Wine versions stored in our Bugzilla DB
 // If bReturnIds is true, version ids are returned instead of names
 function get_bugzilla_versions($bReturnIds = false)
