@@ -149,6 +149,7 @@ Predis\Autoloader::register();
 use Predis\Client as PredisClient;
 define('REDIS_BUGZ_STAMP', 'REDIS_BUGZ_STAMP');
 define('REDIS_BUGZ_VERSIONS', 'REDIS_BUGZ_VERSIONS');
+define('BUGZ_VERSION_LIM', 100);
 // Returns an array containg the Wine versions stored in our Bugzilla DB
 // If bReturnIds is true, version ids are returned instead of names
 function get_bugzilla_versions($bReturnIds = false)
@@ -182,7 +183,10 @@ function get_bugzilla_versions($bReturnIds = false)
         $oXpath = new DomXPath($oDom);
         $aSelectoptions = $oXpath->query("//option[contains(@id, '_version')]");
         $redis->del(REDIS_BUGZ_VERSIONS);
-        foreach ($aSelectoptions as $oSelectoption) {
+
+        $iLim = (sizeof($aSelectoptions) - 1) - BUGZ_VERSION_LIM;
+        for($i = sizeof($aSelectoptions) - 1; $i >= $iLim; $i--) {
+            $oSelectoption = $aSelectoptions[$i];
             $redis->rPush(REDIS_BUGZ_VERSIONS, $oSelectoption->textContent);
         }
 
