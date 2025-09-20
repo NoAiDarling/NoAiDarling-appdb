@@ -71,7 +71,7 @@ INSERT INTO prefs_list (name,def_value,value_list,description) VALUES ('htmledit
 INSERT INTO prefs_list (name,def_value,value_list,description,show_for_group) VALUES ('disable_global_emails', 'no', 'yes|no', 'Disable global e-mail notifications (only send for maintained apps)', 'admin');
 
 insert into user_list values (NOW(), 0, password('testing'), 'Administrator',
-	'Admin@localhost', NOW(), NOW(), 'false' ,'' );
+	'Admin@localhost', NOW(), NOW(), 'false');
 update user_list set userid = 1000 where email = 'Admin@localhost';
 
 
