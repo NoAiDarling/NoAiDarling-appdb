@@ -1,9 +1,12 @@
 <?php
 require_once(BASE."include/config.php");
 
-require_once('PEAR.php');
-require_once('Mail.php');
-require_once('Mail/mime.php');
+require_once '/usr/share/php/libphp-phpmailer/src/PHPMailer.php';
+require_once '/usr/share/php/libphp-phpmailer/src/SMTP.php';
+require_once '/usr/share/php/libphp-phpmailer/src/Exception.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 function mail_appdb($sEmailList,$sSubject,$sMsg)
 {
@@ -43,52 +46,39 @@ function mail_appdb($sEmailList,$sSubject,$sMsg)
         return;
     }
 
-    if (!class_exists('Mail') or !class_exists('Mail_mime'))
-        trigger_error("Mail libs not installed!", E_USER_ERROR);
-
-    $mime = new Mail_mime(array(
-        'head_charset' => 'utf-8',
-        "text_charset" => "utf-8",
-        "html_charset" => "utf-8",
-        "eol"          => "\n"
-    ));
-    $opts = array(
-        'host'     => APPDB_MAIL_HOST,
-        'port'     => APPDB_MAIL_PORT
-    );
-    if (defined(APPDB_MAIL_USER) and !empty(APPDB_MAIL_USER) and !empty(APPDB_MAIL_PASS)) {
-        $opts['auth'] = true;
-        $opts['username'] = APPDB_MAIL_USER;
-        $opts['password'] = APPDB_MAIL_PASS;
-        $opts['timeout'] = '5';
-    }
-
-    $sMsg = $mime->setTXTBody($sMsg);
-    $sMsg = $mime->get();
-
     $bEmailFail = 0;
     foreach ($aEmailList as $sEmailItem)
     {
-        $mail = Mail::factory('smtp', $opts);
-        $headers = array(
-            'To' => $sEmailItem,
-            'From' => APPDB_SENDER_EMAIL,
-            'Reply-To' => APPDB_SENDER_EMAIL,
-            'Subject' => $sSubject,
-            'X-Mailer' => APPDB_OWNER." mailer"
-        );
-        foreach ($headers as $name => $value)
-        {
-            $headers[$name] = $mime->encodeHeader($name, $value, "utf-8", "quoted-printable");
-        }
-        $to = $mime->encodeHeader("to", $sEmailItem, "utf-8", "quoted-printable");
-        $ret = $mail->send($to, array_merge($headers, $mime->headers()), $sMsg);
-        if (PEAR::isError($ret))
-        {
-            trigger_error($ret->getMessage(), E_USER_WARNING);
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            if (defined('APPDB_DEBUG') and !empty(APPDB_DEBUG)) {
+                $mail->SMTPDebug = 2;
+                $mail->Debugoutput = function($str, $level) {
+                    addmsg('smtp error: '.$str);
+                };
+            }
+            $mail->Host = APPDB_MAIL_HOST;
+            $mail->Sender = APPDB_SENDER_EMAIL;
+            if (defined('APPDB_MAIL_USER') and !empty(APPDB_MAIL_USER) and !empty(APPDB_MAIL_PASS)) {
+                $mail->SMTPAuth = true;
+                $mail->Username = APPDB_MAIL_USER;
+                $mail->Password = APPDB_MAIL_PASS;
+                $mail->SMTPSecure = 'tls';
+            }
+            $mail->Port = APPDB_MAIL_PORT;
+            $mail->setFrom(APPDB_SENDER_EMAIL, APPDB_OWNER);
+            $mail->addAddress($sEmailItem);
+            $mail->addCustomHeader("X-Mailer", APPDB_OWNER." Mailer");
+            $mail->Subject = $sSubject;
+            $mail->Body = $sMsg;
+            $mail->send();
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            trigger_error($mail->ErrorInfo, E_USER_WARNING);
             $bEmailFail++;
         }
-        unset($mail, $headers, $to, $ret);
+        unset($mail);
     }
 
     /* we are only going to display a failure, when the number of errors matches
