@@ -278,7 +278,7 @@ class distribution {
         if(query_parameters("UPDATE testResults SET state = '?' WHERE testingId = '?'",
                             'queued', $this->iTestingId))
         {
-            if(query_parameters("UPDATE distribution SET state = '?' WHERE distributionId = '?'",
+            if(query_parameters("UPDATE distributions SET state = '?' WHERE distributionId = '?'",
                                 'queued', $this->iDistributionId))
             {
                 $this->sState = 'queued';
