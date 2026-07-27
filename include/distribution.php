@@ -70,7 +70,7 @@ class distribution {
                             ORDER BY testedRating, testedRelease";
         }
 
-        if($hResult = query_parameters($sQuery, BUGZILLA_PRODUCT_ID, $this->iDistributionId, APPS_DB))
+        if($this->iDistributionId && $hResult = query_parameters($sQuery, $this->iDistributionId))
         {
             while($oRow = query_fetch_object($hResult))
             {

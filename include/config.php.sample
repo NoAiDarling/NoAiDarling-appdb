@@ -62,9 +62,4 @@ define("APPS_DBPASS","");
 define("APPS_DBHOST","");
 define("APPS_DB","");
 
-
-/*
- * bugzilla database info
- */
-define("BUGZILLA_PRODUCT_ID","1");
 ?>
