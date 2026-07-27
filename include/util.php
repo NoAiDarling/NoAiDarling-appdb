@@ -174,20 +174,21 @@ function get_bugzilla_versions($bReturnIds = false)
     // If time to update versions from Bugzilla then do so and store latest list via redis
     if ($redis->get(REDIS_BUGZ_STAMP) == null || time() > $next_update_stamp)
     {
-        $oDom = new DOMDocument('1.0', 'utf-8');
-        $sBugsSearchUrl = "https://bugs.winehq.org/query.cgi?format=advanced";
+        $sBugsSearchUrl = "https://bugs.winehq.org/rest/product/Wine";
         $sHtml = file_get_contents($sBugsSearchUrl);
-        $oDom->loadHTML($sHtml);
+        $json = json_decode($sHtml);
+        $wine_versions = $json->{'products'}[0]->{'versions'};
+        $wine_versions_sort = [];
+        foreach ($wine_versions as $wine_version)
+        {
+            $wine_versions_sort[$wine_version->{'id'}] = $wine_version;
+        }
 
-        // Parses html for <select> <option id="*_version"> containing bugzilla wine versions
-        $oXpath = new DomXPath($oDom);
-        $aSelectoptions = $oXpath->query("//option[contains(@id, '_version')]");
+        krsort($wine_versions_sort);
         $redis->del(REDIS_BUGZ_VERSIONS);
-
-        $iLim = (sizeof($aSelectoptions) - 1) - BUGZ_VERSION_LIM;
-        for($i = sizeof($aSelectoptions) - 1; $i >= $iLim; $i--) {
-            $oSelectoption = $aSelectoptions[$i];
-            $redis->rPush(REDIS_BUGZ_VERSIONS, $oSelectoption->textContent);
+        foreach ($wine_versions_sort as $key => $wine_version)
+        {
+            $redis->rPush(REDIS_BUGZ_VERSIONS, $wine_version->{'name'});
         }
 
         // Update latest redis bugzilla version update timestamp 
