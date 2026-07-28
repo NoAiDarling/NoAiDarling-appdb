@@ -60,7 +60,7 @@ class distribution {
                 /* aren't queued or versions that aren't queued */
         {
             $sQuery = "SELECT testingId
-                            FROM testResults, appFamily, appVersion,
+                            FROM testResults, appFamily, appVersion
                             WHERE testResults.state = 'accepted' AND
                                 testResults.versionId = appVersion.versionId AND
                                 appFamily.appId = appVersion.appId AND
