@@ -627,25 +627,23 @@ class testData{
 
         /* if the test we are displaying is this test then */
         /* mark it as the current test */
+        $sUrl = $sLink.$this->iTestingId;
         if ($this->iTestingId == $iCurrentId)
         {
             $sTRClass = $bgcolor;
             $oTableCell = new TableCell("<b>Current</b>");
-            $oTableCell->SetAlign("center");
         }
         else
         {
-            /* make all non-current rows clickable so clicking on them selects the test as current */
-            $sUrl = $sLink.$this->iTestingId;
-            if($bShowAll)
-                $sUrl .= '&bShowAll=true';
-            $oTableRowClick = new TableRowClick($sUrl);
-
             // add the table element indicating that the user can show the row by clicking on it
             $oTableCell = new TableCell("Show");
-            $oTableCell->SetCellLink($sUrl);
-            $oTableCell->SetAlign("center");
         }
+
+        if($bShowAll)
+            $sUrl .= '&bShowAll=true';
+        $oTableRowClick = new TableRowClick($sUrl);
+        $oTableCell->SetCellLink($sUrl);
+        $oTableCell->SetAlign("center");
 
         $oTableRow->AddCell($oTableCell);
         $oTableRow->AddTextCell($oDistribution->objectMakeLink());
