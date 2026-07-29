@@ -108,10 +108,10 @@ compatibility with Wine.</p>
 
 $str_benefits="
     <ul>
-        <li>Ability to <a href=\"https://wiki.winehq.org/AppDB_Voting_Help\" title=\"help on voting\">vote</a> on your favorite applications</li>
+        <li>Ability to <a href=\"https://gitlab.winehq.org/winehq/appdb/-/wikis/Voting-Help\" title=\"help on voting\">vote</a> on your favorite applications</li>
         <li>Ability to customize the layout and behavior of the AppDB and comments system</li>
         <li>Take credit for your witty posts</li>
-        <li>Ability to sign up to be an <a href=\"https://wiki.winehq.org/AppDB_Maintainer_Guidelines\"
+        <li>Ability to sign up to be an <a href=\"https://gitlab.winehq.org/winehq/appdb/-/wikis/Maintainer-Guidelines\"
             title=\"information about application maintainers\">application maintainer</a></li>
         <li>Submit new applications and versions</li>
         <li>Submit new screenshots</li>
@@ -165,7 +165,7 @@ else
         }
         else
         {
-            echo " please <a href=\"https://wiki.winehq.org/AppDB_Voting_Help\">vote</a> for your favorite application.\n";
+            echo " please <a href=\"https://gitlab.winehq.org/winehq/appdb/-/wikis/Voting-Help\">vote</a> for your favorite application.\n";
         }
     }
 

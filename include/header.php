@@ -47,7 +47,7 @@ if (!empty($sHeaderCode))
         <div class="whq-tabs-menu">&#9776;</div>
         <ul>
             <li><a href="https://www.winehq.org/">WineHQ</a></li>
-            <li><a href="https://wiki.winehq.org/">Wiki</a></li>
+            <li><a href="https://gitlab.winehq.org/wine/wine/-/wikis/home">Wiki</a></li>
             <li class="s"><a href="https://appdb.winehq.org/">AppDB</a></li>
             <li><a href="https://bugs.winehq.org/">Bugzilla</a></li>
             <li><a href="https://forums.winehq.org/">Forums</a></li>

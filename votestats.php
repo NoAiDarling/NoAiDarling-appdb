@@ -202,7 +202,7 @@ if($hResult)
         echo '<h2>No apps found in this category, please vote for your favorite apps!</h2>';
     }
 
-    echo '<p><a href="https://wiki.winehq.org/AppDB_Voting_Help">What does this screen mean?</a></p>';
+    echo '<p><a href="https://gitlab.winehq.org/winehq/appdb/-/wikis/Voting-Help">What does this screen mean?</a></p>';
 }
 
 apidb_footer();

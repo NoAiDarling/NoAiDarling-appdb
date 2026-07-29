@@ -19,7 +19,7 @@ function global_sidebar_menu()
     $g->add("Top 25", BASE."votestats.php");
     $g->add("Submit App", BASE."objectManager.php?sClass=application_queue&amp;".
             "sTitle=Submit+Application&amp;sAction=add");
-    $g->add("Help", "https://wiki.winehq.org/Category:AppDB");
+    $g->add("Help", "https://gitlab.winehq.org/winehq/appdb/-/wikis/home");
     $g->add("Statistics", BASE."appdbStats.php");
     $g->add('Operating systems ('.distribution::objectGetEntriesCount('accepted').')', BASE.'objectManager.php?sClass=distribution&amp;sTitle=View%20Distributions');
     $g->add("Contact Us", "https://forum.winehq.org/viewforum.php?f=11");

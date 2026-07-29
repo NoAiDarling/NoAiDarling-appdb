@@ -880,7 +880,7 @@ class Application {
                     </tbody>
                 </table>
                 <p><b>Super Maintainers:</b>
-                    <a href="https://wiki.winehq.org/AppDB_Maintainers" class="btn btn-default btn-small btn-skinny"><i class="fa fa-question-circle"></i>
+                    <a href="https://gitlab.winehq.org/winehq/appdb/-/wikis/Maintainers" class="btn btn-default btn-small btn-skinny"><i class="fa fa-question-circle"></i>
                     About Maintainership</a></p>
                 <div class="row">
                     <div class="col-xs-6">
