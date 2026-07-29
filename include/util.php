@@ -186,9 +186,13 @@ function get_bugzilla_versions($bReturnIds = false)
 
         krsort($wine_versions_sort);
         $redis->del(REDIS_BUGZ_VERSIONS);
+        $i = 0;
         foreach ($wine_versions_sort as $key => $wine_version)
         {
             $redis->rPush(REDIS_BUGZ_VERSIONS, $wine_version->{'name'});
+
+            if ($i++ > 25)
+                break;
         }
 
         // Update latest redis bugzilla version update timestamp 
