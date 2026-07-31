@@ -755,11 +755,6 @@ class screenshot
         return TRUE;
     }
 
-    function objectMakeUrl()
-    {
-        return APPDB_ROOT."appimage.php?iId={$this->iScreenshotId}";
-    }
-
     function allowAnonymousSubmissions()
     {
         return FALSE;
