@@ -13,7 +13,7 @@ class Image {
     var $iWidth;
     var $iHeight;
     var $iType;
-    
+
     /**
      * Constructor:
      * $sFile is the full path to the image. $this->isLoaded()
@@ -28,40 +28,40 @@ class Image {
         else /* relative path */
             $this->sFile = appdb_fullpath($sPath);
 
-        $oInfo = @getimagesize($this->sFile);       
-        
+        $oInfo = @getimagesize($this->sFile);
+
         if( empty($oInfo) )
         {
             $this->set_debuglog("Failed to load file ".$this->sFile);
             return;
         }
-        
+
         switch( $oInfo[2] )
         {
             case 2:
                 $oImage = imagecreatefromjpeg($this->sFile);
             break;
-        
+
             case 3:
                 $oImage = imagecreatefrompng($this->sFile);
             break;
-        
+
             default;
                 $this->set_debuglog("Image type ({$oInfo[2]}) unknown");
                 return;
             return;
         }
-        
+
         $this->oImage = $oImage;
         $this->iWidth = $oInfo[0];
         $this->iHeight = $oInfo[1];
         $this->iType = $oInfo[2];
-        
+
         $this->set_debuglog("New image class created with as $this->sFile as"
                           ." file and {$oInfo[2]} as type. Dimensions"
                           ." {$oInfo[0]}x{$oInfo[1]}");
     }
-    
+
     /**
      * isLoaded()
      * This function should always be checked after loading a file
@@ -75,7 +75,7 @@ class Image {
         else
             return false;
     }
-    
+
     /**
      * Returns the latest debug log made for the last function. If $bFull is
      * set it will return the full log as array of the object.
@@ -87,17 +87,17 @@ class Image {
         else
             return end($this->aDebugLog);
     }
-    
+
     function get_width()
     {
         return $this->iWidth;
     }
-    
+
     function get_height()
     {
         return $this->iHeight;
     }
-    
+
     /**
      * Returns the image resource identifier.
      */
@@ -105,7 +105,7 @@ class Image {
     {
         return $this->oImage;
     }
-    
+
     /**
      * make_thumb()
      *
@@ -122,7 +122,7 @@ class Image {
      */
     function make_thumb($iNewWidth, $iNewHeight, $iBorderWidth = 0, $sBorderColor = '')
     {
-        
+
         if($iNewWidth == 0 AND $iNewHeight == 0)
         {
             $iNewWidth = APPDB_THUMBNAIL_WIDTH;
@@ -136,38 +136,38 @@ class Image {
         {
             $iNewWidth = $this->calculate_proportions($this->iWidth, $this->iHeight, 0, $iNewHeight);
         }
-                    
+
         $this->set_debuglog("Resizing image to $iNewWidth x $iNewHeight");
-        
+
         if(!empty($sBorderColor) and $iBorderWidth > 0)
             $this->resize_image_border($sBorderColor,$iBorderWidth,$iNewHeight,$iNewWidth);
         else
             $this->resize_image($iNewWidth,$iNewHeight);
     }
-    
+
     /**
-     * make_full() 
+     * make_full()
      *
      * Function will make sure your image is as big or smaller than the sizes
      * set here with $max_width and $max_height. Aspect ratio will be mantained.
      *
      * If none are set APPDB_SCREENSHOT_MAXWIDTH and APPDB_SCREENSHOT_MAXHEIGHT
      * are used.
-     */    
+     */
     function make_full($iMaxWidth = 0, $iMaxHeight = 0)
     {
         if(!$iMaxWidth > 0)
             $iMaxWidth = APPDB_SCREENSHOT_MAXWIDTH;
-        
+
         if(!$iMaxHeight > 0)
             $iMaxHeight = APPDB_SCREENSHOT_MAXHEIGHT;
-            
+
         if($this->iWidth > $iMaxWidth)
         {
             /* The width is too much */
             $iNewWidth = $iMaxWidth;
             $iNewHeight = $this->calculate_proportions($this->iWidth,$this->iHeight,$iNewWidth);
-            
+
             /* Check if the height is also within the limits */
             if($iNewHeight > $iMaxHeight )
             {
@@ -187,12 +187,12 @@ class Image {
             $iNewWidth = $this->iWidth;
             $iNewHeight = $this->iHeight;
         }
-        
+
         $this->set_debuglog("Resizing image to $iNewWidth x $iNewHeight");
-        
+
         $this->resize_image($iNewWidth, $iNewHeight);
     }
-    
+
     /**
      * resize_image()
      *
@@ -213,7 +213,7 @@ class Image {
             imagecopyresized($oNewImage,$this->oImage,0,0,0,0,
                              $iNewWidth,$iNewHeight,$this->iWidth,$this->iHeight);
         }
-        
+
         // FIXME: With PHP 8, GdImage can not be converted to a string, so this log entry must be updated to no longer rely on that conversion.
         // Using $this->sFile would lose the distinction between $oNewImage and $this->oImage, so we need to find something else.
         // $this->set_debuglog("imagecopyresized($oNewImage,$this->oImage,0,0,0,0,$iNewWidth,"
@@ -223,7 +223,7 @@ class Image {
         $this->iWidth = $iNewWidth;
         $this->iHeight= $iNewHeight;
     }
-    
+
     /**
      * resize_image_border()
      *
@@ -236,7 +236,7 @@ class Image {
         $r = hexdec(substr($sBorderColor, 1, 2));
         $g = hexdec(substr($sBorderColor, 3, 2));
         $b = hexdec(substr($sBorderColor, 5, 2));
-        
+
         /* We multiply the border width by two because there are borders
          on both sides */
         // GD 2.x
@@ -252,7 +252,7 @@ class Image {
         later on we will overwrite everything except the border */
         $color = ImageColorAllocate( $new, $r, $g, $b );
         imagefill($new,0,0,$color);
-        
+
         // GD 2.x
         if(function_exists("imagecopyresampled"))
         {
@@ -265,7 +265,7 @@ class Image {
                              0,0,$iNewWidth,$iNewHeight,
                              $this->iWidth,$this->iHeight);
         }
-        
+
         // FIXME: With PHP 8, GdImage can not be converted to a string, so this log entry must be updated to no longer rely on that conversion.
         // Using $this->sFile would lose the distinction between $new and $this->oImage, so we need to find something else.
         // $this->set_debuglog("imagecopyresized($new,$this->oImage,$iBorderWidth,$iBorderWidth,0,0,"
@@ -276,33 +276,33 @@ class Image {
         $this->iWidth = $iNewWidth;
         $this->iHeight= $iNewHeight;
     }
-    
+
     /**
      * add_watermark()
      *
      * $watermark is an image resource identifier to any image resource.
      *
-     * $min_mark_wwidth and $min_mark_height are the minimum sizes of the
+     * $min_mark_width and $min_mark_height are the minimum sizes of the
      * destination image before the watermark is added. If none are set
      * both will be 0.
      *
      * A warning for transparency. If you resize an image down with make_thumb()
-     * you loose the transparency on png images.
+     * you lose the transparency on png images.
      */
     function add_watermark($oWatermark, $iMinMarkWidth = 0, $iMinMarkHeight = 0)
     {
         $iWatermarkWidth = imagesx($oWatermark);
         $iWatermarkHeight = imagesy($oWatermark);
-          
+
         if($this->iWidth > $iMinMarkWidth AND
            $this->iHeight > $iMinMarkHeight)
         {
             $iWatermark_x = $this->iWidth - $iWatermarkWidth;
             $iWatermark_y = $this->iHeight - $iWatermarkHeight;
-            
+
             imagecopy($this->oImage, $oWatermark, $iWatermark_x, $iWatermark_y,
                       0, 0, $iWatermarkWidth, $iWatermarkHeight); 
-            
+
             // FIXME: With PHP 8, GdImage can not be converted to a string, so this log entry must be updated to no longer rely on that conversion.
             // Using $this->sFile would lose the distinction between $this->oImage and $oWatermark (is this a GdImage object too?), so we need to find something else.
             // $this->set_debuglog("imagecopy($this->oImage, $oWatermark,"
@@ -310,7 +310,7 @@ class Image {
             //                     ."$iWatermarkWidth, $iWatermarkHeight);");
         }
     }
-    
+
     /**
      * Save the image to a file set with $store.
      *
@@ -325,27 +325,27 @@ class Image {
             $sOutputFilename = $this->sFile;
         if($iType == 0)
             $iType = $this->iType;
-        
+
         switch($iType)
         {
             case 2:
             imagejpeg($this->oImage, $sOutputFilename, $iQuality);
             $this->set_debuglog("Saved file as jpeg to $sOutputFilename");
             break;
-            
+
             case 3:
             imagepng($this->oImage, $sOutputFilename);
             $this->set_debuglog("Saved file as png to $sOutputFilename");
             break;
-            
+
             default:
             $this->set_debuglog("Unknown output type");
             return;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Output the files to the browser.
      *
@@ -355,12 +355,12 @@ class Image {
      * If none (or 0) is set the original type of the file is used.
      *
      * $iQuality is the jpeg output quality (100 best, 0 worst)
-     */  
+     */
     function output_to_browser($bHeader, $iType = 0, $iQuality = 75)
     {
         if($iType == 0 )
             $iType = $this->iType;
-        
+
         switch($iType)
         {
             case 2:
@@ -369,19 +369,19 @@ class Image {
             imagejpeg($this->oImage,null,$iQuality);
             $this->set_debuglog("Outputed file as jpeg to browser");
             break;
-            
+
             case 3:
             if($bHeader)
                 header('Content-type: image/png');
             imagepng($this->oImage);            
             $this->set_debuglog("Outputed file as png to browser");
             break;
-            
+
             default:
             $this->set_debuglog("Unknown output type");
         }
     }
-    
+
     /**
      * Destroys the image resource. Be sure to do this at the end of your
      * actions with this object.
@@ -392,7 +392,7 @@ class Image {
             imagedestroy($this->oImage);
     }
 
-    /**    
+    /**
      * Deletes the screenshot from the file system.
      */
     function delete()
@@ -402,16 +402,15 @@ class Image {
             unlink($this->sFile);
     }
 
-    
     /***********************
     * PRIVATE FUNCTIONS
     ************************/
-    
+
     function set_debuglog( $sLog )
     {
         $this->aDebugLog[] = $sLog;
     }
-    
+
     function calculate_proportions($iWidth, $iHeight,
                                    $iNewWidth, $iNewHeight = '0')
     {
@@ -426,17 +425,16 @@ class Image {
 
 }
 
-
 class ImageResource extends Image {
-    
+
     function __construct($oImage,$iType)
     {
-        
+
         $this->oImage = $oImage;
         $this->iWidth = imagesx($oImage);
         $this->iHeight = imagesy($oImage);
         $this->iType = $iType;
-        
+
         $this->set_debuglog("New image class created with $oImage as"
                           ." image resource and $iType as type. Dimensions"
                           ." {$this->iWidth}x{$this->iHeight}");
