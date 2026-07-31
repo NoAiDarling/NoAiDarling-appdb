@@ -164,6 +164,7 @@ class screenshot
     function reject()
     {
         $this->delete();
+        $this->mailSubmitter(true);
     }
 
     /**
@@ -351,8 +352,7 @@ class screenshot
                     } else
                     {
                         $sSubject = "Submitted screenshot deleted";
-                        $sMsg = "The screenshot with description '".$this->sDescription.
-                                "' that you submitted for $sFor has been deleted.";
+                        $sMsg = "The screenshot {$this->hasDescription()} that you submitted for $sFor has been deleted.";
                     }
                 break;
             }
@@ -365,8 +365,7 @@ class screenshot
                     if(!$bParentAction)
                     {
                         $sSubject = "Screenshot for $sFor deleted";
-                        $sMsg = "The screenshot with description '".$this->sDescription.
-                                "' for $sFor has been deleted.";
+                        $sMsg = "The screenshot {$this->hasDescription()} for $sFor has been deleted.";
                     }
                 break;
             }
@@ -386,28 +385,31 @@ class screenshot
             if(!$bRejected)
             {
                 $sSubject =  "Submitted screenshot accepted";
-                $sMsg  = "The screenshot you submitted for ".$sAppName." has been accepted.";
+                $sMsg  = "The screenshot you submitted for $sAppName has been accepted.\n\n";
             } else
             {
                  $sSubject =  "Submitted screenshot rejected";
-                 $sMsg  = "The screenshot you submitted for ".$sAppName." has been rejected.";
+                 $sMsg  = "The screenshot you submitted for $sAppName has been rejected.\n\n";
+                 $sMsg .= "Reasons given: \n";
             }
-            $sMsg .= $aClean['sReplyText']."\n";
+            $sMsg .= "{$aClean['sReplyText']}.\n\n";
             $sMsg .= "We appreciate your help in making the Application Database better for all users.";
-                
-            mail_appdb($oSubmitter->sEmail, $sSubject ,$sMsg);
+
+            $oSubmitter = new User($this->iSubmitterId);
+            if($oSubmitter->sEmail)
+            {
+                mail_appdb($oSubmitter->sEmail, $sSubject, $sMsg);
+            }
+
         }
     }
 
     function mailMaintainers($bDeleted=false)
     {
+        global $aClean;
+
         $oVersion = new version($this->iVersionId);
         $sAppName = version::fullName($this->iVersionId);
-
-        if(!$bDeleted)
-            $sMsg = $this->objectMakeUrl()."\n";
-        else
-            $sMsg = $oVersion->objectMakeUrl()."\n";
 
         if(!$bDeleted)
         {
@@ -418,9 +420,8 @@ class screenshot
                 if($this->iSubmitterId)
                 {
                     $oSubmitter = new User($this->iSubmitterId);
-                    $sMsg .= "This screenshot has been submitted by ".
-                            $oSubmitter->sRealname.".";
-                    $sMsg .= "\n";
+                    $sMsg = "This screenshot has been submitted by {$oSubmitter->sRealname}.\n";
+                    $sMsg .= APPDB_ROOT."screenshots.php?iVersionId={$this->iVersionId}\n";
                 }
                 addmsg("The screenshot was successfully added into the database.",
                        "green");
@@ -428,15 +429,17 @@ class screenshot
             {
                 $sSubject = "Screenshot for $sAppName submitted by ".
                         $_SESSION['current']->sRealname;
-                $sMsg .= "This screenshot has been queued.";
-                $sMsg .= "\n";
-                addmsg("The screenshot you submitted will be added to the ".
-                        "database after being reviewed.", "green");
+                $sMsg = "This screenshot has been queued.\n";
+                $sMsg .= APPDB_ROOT."objectManager.php?bIsQueue=true&bIsRejected=false&sClass=screenshot&sTitle=Screenshot+Queue\n";
+                addmsg("The screenshot you submitted will be added to the database after being reviewed.", "green");
             }
         } else // Screenshot deleted.
         {
-            $sSubject = "Screenshot for $sAppName deleted by ".
-                    $_SESSION['current']->sRealname;
+            $sSubject = "Screenshot for $sAppName deleted by {$_SESSION['current']->sRealname}";
+            $sMsg = "$sSubject.\n\n";
+            $sMsg .= "Reasons given:\n";
+            $sMsg .= "{$aClean['sReplyText']}.\n\n";
+            $sMsg .= APPDB_ROOT."objectManager.php?sClass=version&iId={$this->iVersionId}\n";
             addmsg("Screenshot deleted.", "green");
         }
 
@@ -765,6 +768,14 @@ class screenshot
     function objectGetId()
     {
         return $this->iScreenshotId;
+    }
+
+    function hasDescription() {
+        if(!empty($this->sDescription))
+        {
+            return "with description '$this->sDescription'";
+        }
+        return "";
     }
 }
 
