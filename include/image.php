@@ -38,17 +38,20 @@ class Image {
 
         switch( $oInfo[2] )
         {
-            case 2:
+            case IMAGETYPE_JPEG:
                 $oImage = imagecreatefromjpeg($this->sFile);
             break;
 
-            case 3:
+            case IMAGETYPE_PNG:
                 $oImage = imagecreatefrompng($this->sFile);
             break;
 
-            default;
+			case IMAGETYPE_WEBP:
+				$oImage = imagecreatefromwebp($this->sFile);
+			break;
+
+            default:
                 $this->set_debuglog("Image type ({$oInfo[2]}) unknown");
-                return;
             return;
         }
 
@@ -316,7 +319,7 @@ class Image {
      *
      * $iType is optional and is set like the second index of getimagesize().
      * If none (or 0) is set the original type of the file is used.
-     * If $store is not give, the current file name will be used.
+     * If $store is not given, the current file name will be used.
      * $quality is the jpeg output quality (100 best, 0 worst). Default is 75
      */
     function output_to_file($sOutputFilename=null, $iType = 0, $iQuality = 75)
@@ -328,18 +331,23 @@ class Image {
 
         switch($iType)
         {
-            case 2:
-            imagejpeg($this->oImage, $sOutputFilename, $iQuality);
-            $this->set_debuglog("Saved file as jpeg to $sOutputFilename");
+            case IMAGETYPE_JPEG:
+                imagejpeg($this->oImage, $sOutputFilename, $iQuality);
+                $this->set_debuglog("Saved file as jpeg to $sOutputFilename");
             break;
 
-            case 3:
-            imagepng($this->oImage, $sOutputFilename);
-            $this->set_debuglog("Saved file as png to $sOutputFilename");
+            case IMAGETYPE_PNG:
+                imagepng($this->oImage, $sOutputFilename);
+                $this->set_debuglog("Saved file as png to $sOutputFilename");
+            break;
+
+            case IMAGETYPE_WEBP:
+                imagewebp($this->oImage, $sOutputFilename, $iQuality);
+                $this->set_debuglog("Save file as webp to $sOutputFilename");
             break;
 
             default:
-            $this->set_debuglog("Unknown output type");
+                $this->set_debuglog("Unknown output type");
             return;
         }
 
@@ -363,18 +371,25 @@ class Image {
 
         switch($iType)
         {
-            case 2:
-            if($bHeader)
-                header('Content-type: image/jpeg');
-            imagejpeg($this->oImage,null,$iQuality);
-            $this->set_debuglog("Outputed file as jpeg to browser");
+            case IMAGETYPE_JPEG:
+                if($bHeader)
+                    header('Content-type: image/jpeg');
+                    imagejpeg($this->oImage, null, $iQuality);
+                    $this->set_debuglog("Output file as jpeg to browser");
             break;
 
-            case 3:
-            if($bHeader)
-                header('Content-type: image/png');
-            imagepng($this->oImage);            
-            $this->set_debuglog("Outputed file as png to browser");
+            case IMAGETYPE_PNG:
+                if($bHeader)
+                    header('Content-type: image/png');
+                    imagepng($this->oImage, null, $iQuality);
+                    $this->set_debuglog("Output file as png to browser");
+            break;
+
+            case IMAGETYPE_WEBP:
+               if($bHeader)
+                    header('Content-type: image/webp');
+                    imagewebp($this->oImage, null, $iQuality);
+                    $this->set_debuglog("Output file as webp to browser");
             break;
 
             default:

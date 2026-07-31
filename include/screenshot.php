@@ -107,7 +107,7 @@ class screenshot
                     if (!query_parameters($sQuery, $this->iScreenshotId, $this->iScreenshotId)) return false;
                 } else
                 {
-                    addmsg("Unable to generate image or thumbnail. The file format might not be recognized. Please use PNG or JPEG only.","red");
+                    addmsg("Unable to generate image or thumbnail. The file format might not be recognized. Please use PNG, JPEG or WEBP only.","red");
                     $sQuery = "DELETE
                                FROM appData
                                WHERE id = '?'";
