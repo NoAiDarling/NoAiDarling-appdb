@@ -884,7 +884,7 @@ class ObjectManager
         {
             $sPlural = ($iAffected == 1) ? "": "s";
             addmsg("Moved $iAffected child object$sPlural", "green");
-        } else if($iAfffected === FALSE)
+        } else if($iAffected === FALSE)
         {
             /* We don't want to delete this object if some children were not moved */
             addmsg("Failed to move child objects", "red");
