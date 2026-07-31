@@ -151,11 +151,17 @@ if($aClean['iVersionId'] && $_SESSION['current']->isLoggedIn())
     echo '<form enctype="multipart/form-data" action="screenshots.php" name="sImageForm" method="post">',"\n";
     echo html_frame_start("Upload Screenshot","400","",0);
     echo '<table border=0 cellpadding=6 cellspacing=0 width="100%">',"\n";
-      
+
     echo '<tr><td class=color1>Image</td><td class=color0><input name="sImageFile" type="file" size="24"></td></tr>',"\n";
     echo '<tr><td class="color1">Description</td><td class="color0"><input type="text" name="sScreenshotDesc" maxlength="20" size="24"></td></tr>',"\n";
-    echo '<tr><td class="color1">Wine version</td><td class="color0">'.make_bugzilla_version_list('sTestedVersion').'</td></tr>',"\n";
-       
+
+	$sSelect = '<select name="sTestedVersion">';
+	foreach (get_bugzilla_versions() as $sVersion) {
+		$sSelect .= "<option value=\"$sVersion\">$sVersion</option>";
+	}
+	$sSelect .= '</select>';
+	echo '<tr><td class="color1">Wine version</td><td class="color0">'.$sSelect.'</td></tr>',"\n";
+
     echo '<tr><td colspan=2 align=center class=color3><input type="submit" value="Send File"></td></tr>',"\n";
     echo '</table>',"\n";
     echo html_frame_end();
