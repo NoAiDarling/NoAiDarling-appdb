@@ -31,7 +31,7 @@ class screenshot
     var $sSubmitTime;
     var $iSubmitterId;
 
-    /**    
+    /**
      * Constructor, fetches the data and image objects if $iScreenshotId is given.
      */
     function __construct($iScreenshotId = null, $oRow = null)
@@ -43,8 +43,8 @@ class screenshot
         if(!$oRow)
         {
             $hResult = query_parameters("SELECT appData.*, appVersion.appId AS appId
-                    FROM appData, appVersion 
-                    WHERE appData.versionId = appVersion.versionId 
+                    FROM appData, appVersion
+                    WHERE appData.versionId = appVersion.versionId
                     AND id = '?'
                     AND type = 'screenshot'", $iScreenshotId);
             if($hResult)
@@ -65,7 +65,7 @@ class screenshot
             $this->hFile = null;
         }
     }
- 
+
 
     /**
      * Creates a new screenshot.
@@ -75,7 +75,7 @@ class screenshot
         $hResult = query_parameters("INSERT INTO appData
                 (versionId, type, description, testedVersion, state, submitTime, submitterId)
                                     VALUES('?', '?', '?', '?', '?', ?, '?')",
-                                    $this->iVersionId, "screenshot", 
+                                    $this->iVersionId, "screenshot",
                                     $this->sDescription, $this->sTestedVersion,
                                     $this->mustBeQueued() ? 'queued' : 'accepted',
                                     "NOW()",
@@ -91,7 +91,7 @@ class screenshot
                 // whoops, moving failed, do something
                 addmsg("Unable to move screenshot from '".$this->hFile['tmp_name']."' to '".$moveToPath."'", "red");
                 $sQuery = "DELETE
-                           FROM appData 
+                           FROM appData
                            WHERE id = '?'";
                 query_parameters($sQuery, $this->iScreenshotId);
                 return false;
@@ -101,15 +101,15 @@ class screenshot
                 if($this->generate())
                 {
                     // we have to update the entry now that we know its name
-                    $sQuery = "UPDATE appData 
-                               SET url = '?' 
+                    $sQuery = "UPDATE appData
+                               SET url = '?'
                                WHERE id = '?'";
                     if (!query_parameters($sQuery, $this->iScreenshotId, $this->iScreenshotId)) return false;
                 } else
                 {
-                    addmsg("Unable to generate image or thumbnail. The file format might not be recognized. Please use PNG or JPEG only.","red");
+                    addmsg("Unable to generate image or thumbnail. The file format might not be recognized. Please use PNG, JPEG or WEBP only.","red");
                     $sQuery = "DELETE
-                               FROM appData 
+                               FROM appData
                                WHERE id = '?'";
                     query_parameters($sQuery, $this->iScreenshotId);
                     return false;
@@ -132,8 +132,8 @@ class screenshot
         return $this->delete();
     }
 
-    /**    
-     * Deletes the screenshot from the database. 
+    /**
+     * Deletes the screenshot from the database.
      * and request its deletion from the filesystem (including the thumbnail).
      *
      * Returns: true if deletion was success, false if otherwise
@@ -211,19 +211,19 @@ class screenshot
             $this->sDescription = $sDescription;
     }
 
-    
+
     /**
      * This method generates a watermarked screenshot and thumbnail from the original file.
      * Useful when changing thumbnail, upgrading GD, adding an image, etc.
      * Return false if an image could not be loaded.
      */
-    function generate() 
+    function generate()
     {
         global $watermark;
         // first we will create the thumbnail
         // load the screenshot
         $this->oThumbnailImage  = new Image("/data/screenshots/originals/".$this->sUrl);
-        if(!$this->oThumbnailImage->isLoaded()) 
+        if(!$this->oThumbnailImage->isLoaded())
         {
             $this->oThumbnailImage->delete(); // if we cannot load the original file we delete it from the filesystem
             return false;
@@ -231,7 +231,7 @@ class screenshot
         $this->oThumbnailImage->make_thumb(0,0,1,'#000000');
         // store the image
         $this->oThumbnailImage->output_to_file(appdb_fullpath("/data/screenshots/thumbnails/".$this->sUrl));
-            
+
         // now we'll process the screenshot image for watermarking
         // load the screenshot
         $this->oScreenshotImage  = new Image("/data/screenshots/originals/".$this->sUrl);
@@ -248,7 +248,7 @@ class screenshot
         $this->oScreenshotImage->add_watermark($watermark->get_image_resource());
         // store the watermarked image
         $this->oScreenshotImage->output_to_file(appdb_fullpath("/data/screenshots/".$this->sUrl));
-         
+
         return true;
     }
 
@@ -450,12 +450,12 @@ class screenshot
 
     /**
      * Get a random image for a particular version of an app.
-     * If the version is not set, get a random app image 
+     * If the version is not set, get a random app image
      *
      * $bFormatting == false turns off all extranious formatting applied to the returned image html
      */
     public static function get_random_screenshot_img($iAppId = null, $iVersionId = null,
-                                       $bFormatting = true) 
+                                       $bFormatting = true)
     {
         // initialize variables to avoid notices when appending to them
         $hResult = null;
@@ -464,20 +464,20 @@ class screenshot
         // we want a random screenshots for this app
         if($iAppId && !$iVersionId)
         {
-            $hResult = query_parameters("SELECT appData.id, appData.description, RAND() AS rand 
-                               FROM appData, appVersion 
+            $hResult = query_parameters("SELECT appData.id, appData.description, RAND() AS rand
+                               FROM appData, appVersion
                                WHERE appData.versionId = appVersion.versionId
-                               AND appVersion.appId = '?' 
-                               AND type = 'screenshot' 
-                               AND appData.state = 'accepted' 
+                               AND appVersion.appId = '?'
+                               AND type = 'screenshot'
+                               AND appData.state = 'accepted'
                                ORDER BY rand", $iAppId);
         } else if ($iVersionId) // we want a random screenshot for this version
         {
-            $hResult = query_parameters("SELECT id, description, RAND() AS rand 
-                                FROM appData 
-                                WHERE versionId = '?' 
-                                AND type = 'screenshot' 
-                                AND state = 'accepted' 
+            $hResult = query_parameters("SELECT id, description, RAND() AS rand
+                                FROM appData
+                                WHERE versionId = '?'
+                                AND type = 'screenshot'
+                                AND state = 'accepted'
                                 ORDER BY rand", $iVersionId);
         }
 
