@@ -565,7 +565,7 @@ class screenshot
         if (defined("APPDB_SCREENSHOT_URL") and !empty(APPDB_SCREENSHOT_URL))
             $url = APPDB_SCREENSHOT_URL;
         else
-            $url = APPDB_ROOT."data/";
+            $url = APPDB_ROOT."data/screenshots/";
         $this->sDescription = preg_replace('/\n/', '', $this->sDescription);
         return "<div class=\"whq-shot\"><img src=\"".$url."thumbnails/".$this->iScreenshotId."\" style=\"width:130px;\" ".
                "alt=\"{$this->sDescription}\" data-shot=\"".$url.$this->iScreenshotId."\"><i class=\"fa fa-search-plus\"></i></div>\n";
