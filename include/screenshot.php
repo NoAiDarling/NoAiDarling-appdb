@@ -680,26 +680,41 @@ class screenshot
         return ($this->bQueued) ? 'queued' : 'accepted';
     }
 
-    function canEdit()
+    public function canEdit(): bool
     {
-        if($this)
-        {
-            $oAppData = new appData($this->objectGetId(), null, $this);
-            return $oAppData->canEdit();
-        } else
-            return appData::canEdit();
+        // Return early if no user is logged in
+        if (!isset($_SESSION['current']) || !$_SESSION['current']) {
+            return false;
+        }
+
+        // Admins
+        if ($_SESSION['current']->hasPriv("admin")) {
+            return true;
+        }
+
+        // Maintainers (including super maintainers)
+        if ($this->iVersionId && maintainer::isUserMaintainer($_SESSION['current'], $this->iVersionId)) {
+            return true;
+        }
+
+        // None of the above
+        return false;
     }
 
-    function mustBeQueued()
+    public function mustBeQueued(): bool
     {
-        if($this)
-        {
-            $oAppData = new appData();
-            $oAppData->iVersionId = $this->iVersionId;
-            $oAppData->iAppId = NULL;
-            return $oAppData->mustBeQueued();
-        } else
-            return appData::mustBeQueued();
+        // Admins
+        if ($_SESSION['current']->hasPriv("admin")) {
+            return false;
+        }
+
+        // Maintainers (including super maintainers)
+        if ($this->iVersionId && maintainer::isUserMaintainer($_SESSION['current'], $this->iVersionId)) {
+            return false;
+        }
+
+        // None of the above
+        return true;
     }
 
     function objectGetTableRow()
