@@ -123,10 +123,11 @@ while ($oRow = query_fetch_object($Ids))
       ($_SESSION['current']->hasPriv("admin") || 
        $_SESSION['current']->isMaintainer($aClean['iVersionId'])))
     {
-        echo "<br>[<a href='".$_SERVER['PHP_SELF'];
+        echo "<br><a href='".$_SERVER['PHP_SELF'];
         echo "?sCmd=delete&amp;iImageId=$oRow->id";
-        echo "&amp;iPage=".$currentPage."&amp;iItemsPerPage=".$ItemsPerPage."'>";
-        echo "Delete Image</a>]";
+        echo "&amp;iPage=".$currentPage."&amp;iItemsPerPage=".$ItemsPerPage."' ";
+        echo "class='btn btn-default'><i class='fa fa-trash-o'></i>";
+        echo " Delete</a>";
     }
     echo "</div></td>\n";
    // end row if counter of 3
