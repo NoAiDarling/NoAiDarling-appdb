@@ -522,9 +522,9 @@ class screenshot
 
     /**
      * Get all screenshots for an application or a specific version
-     * @param type $iAppId
-     * @param type $iVersionId
-     * @param type $bQueued
+     * @param ?int $iAppId
+     * @param ?int $iVersionId
+     * @param bool $bQueued
      * @return boolean
      */
     public static function get_screenshots($iAppId = null, $iVersionId = null, $bQueued = "false")
