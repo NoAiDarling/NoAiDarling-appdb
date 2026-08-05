@@ -94,6 +94,13 @@ if($hResult && query_num_rows($hResult))
             $iCurrentVersionId = $oRow->versionId;
             $bUserIsMaintainerOfVersion = $_SESSION['current']->isMaintainer($iCurrentVersionId);
 
+            // Check if current user is original submitter
+            $bUserIsSubmitter = (
+                isset($oScreenshot->iSubmitterId) && 
+                (int)$oScreenshot->iSubmitterId > 0 && 
+                (int)$oScreenshot->iSubmitterId === (int)$_SESSION['current']->iUserId
+            );
+
             echo html_frame_start("Version ".Version::lookup_name($iCurrentVersionId));
             echo "<div align=center><table><tr>\n";
         }

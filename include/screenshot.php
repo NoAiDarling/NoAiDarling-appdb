@@ -697,6 +697,13 @@ class screenshot
             return true;
         }
 
+        // Original submitter (a user can edit their own submissions)
+        if (isset($this->iSubmitterId) && (int)$this->iSubmitterId > 0) {
+            if ((int)$this->iSubmitterId === (int)$_SESSION['current']->iUserId) {
+                return true;
+            }
+        }
+
         // None of the above
         return false;
     }

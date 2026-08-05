@@ -542,12 +542,23 @@ class appData
 
     function canEdit()
     {
+
+        // Return early if no user is logged in
+        if (!isset($_SESSION['current']) || !$_SESSION['current']) {
+            return false;
+        }
+
         if($_SESSION['current']->hasPriv("admin"))
             return TRUE;
+
         if($this)
         {
-            if($this->bQueued && $this->iSubmitterId == $_SESSION['current']->iUserId)
-                return true;
+            // Original submitter
+            if (isset($this->iSubmitterId) && (int)$this->iSubmitterId > 0) {
+                if ((int)$this->iSubmitterId === (int)$_SESSION['current']->iUserId) {
+                    return true;
+                }
+            }
 
             if($this->iVersionId)
             {
