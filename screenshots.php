@@ -106,13 +106,9 @@ if($hResult && query_num_rows($hResult))
         echo "<div align=center>". substr($oRow->description,0,20). "\n";
         echo '<br />Wine version: ';
         echo $oScreenshot->sTestedVersion ? $oScreenshot->sTestedVersion : 'N/A';
+
         //show admin delete link
-        if($_SESSION['current']->isLoggedIn() &&
-            (
-              $_SESSION['current']->hasPriv("admin") ||
-              $bUserIsMaintainerOfVersion
-            )
-          )
+        if ($oScreenshot->canEdit())
         {
             $oM = new objectManager("screenshot");
             $oM->setReturnTo("screenshots.php?iAppId=".$oScreenshot->iAppId."&amp;iVersionId=".$oScreenshot->iVersionId);
