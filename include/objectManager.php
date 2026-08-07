@@ -984,7 +984,7 @@ class ObjectManager
 
     /* Display a page where the user can select which object the children of the current
        object can be moved to */
-    public function display_move_children()
+    public function display_move_children($aClean)
     {
         $oObject = new $this->sClass($this->iId);
         if(!$oObject->canEdit())
@@ -1027,13 +1027,21 @@ class ObjectManager
             }
         } else
         {
+            $this->handleMultiPageControls($aClean, TRUE);
+
             /* We only allow moving to non-queued objects */
-            if(!$hResult = $oObject->objectGetEntries('accepted'))
+            if(!$hResult = $oObject->objectGetEntries('accepted',
+                                                      $this->oMultiPage->iItemsPerPage,
+                                                      $this->oMultiPage->iLowerLimit,
+                                                      $this->oSortInfo->sCurrentSort,
+                                                      $this->oSortInfo->bAscending,
+                                                      $this->oFilters))
+
             {
                 echo "Failed to get list of objects.<br>\n";
                 return FALSE;
             }
-
+            $this->showNumberOfResults($oObject);
             for($i = 0; $oRow = query_fetch_object($hResult); $i++)
             {
                 $oCandidate = new $this->sClass(null, $oRow);
@@ -1238,7 +1246,7 @@ class ObjectManager
            method_exists($oObject, "objectGetId") && $oObject->canEdit())
         {
             echo "<a href=\"".$this->makeUrl("showMoveChildren", $this->iId,
-                 "Move Child Objects")."\" class=\"btn btn-default\"><i class=\"fa fa-arrows\"></i> Move child objects</a>\n";
+                 "Move Child Objects")."&amp;iItemsPerPage=25&amp;iPage=1&amp;sOrderBy=appName&amp;bAscending=true"."\" class=\"btn btn-default\"><i class=\"fa fa-arrows\"></i> Move child objects</a>\n";
             return true;
         }
 
@@ -1545,7 +1553,7 @@ class ObjectManager
 
     /* Inserts the information in an objectManager object as form data, so that it
        is preserved when submitting forms */
-    public function makeUrlFormData()
+    public function makeUrlFormData($sAction=false)
     {
         $sIsQueue = $this->getIsQueue() ? "true" : "false";
         $sIsRejected = $this->sState == 'rejected' ? "true" : "false";
@@ -1556,6 +1564,7 @@ class ObjectManager
         $sReturn .= "<input type=\"hidden\" name=\"sTitle\" value=\"".$this->sTitle."\">\n";
         $sReturn .= "<input type=\"hidden\" name=\"sReturnTo\" value=\"".$this->sReturnTo."\">\n";
         $sReturn .= "<input type=\"hidden\" name=\"iId\" value=\"".$this->iId."\">\n";
+        $sReturn .= "<input type=\"hidden\" name=\"sAction\" value=\"".$sAction."\">\n";
 
         if($this->oMultiPage->bEnabled)
         {
@@ -1675,10 +1684,10 @@ class ObjectManager
         // per-page dropdown and update button
         if($bItemsPerPageSelector)
         {
-            $sControls = "<form action=\"".$this->makeUrl()."\" method=\"get\">";
+            $sControls = "<form action=\"".$this->makeUrl($aClean["sAction"], $aClean["iId"])."\" method=\"get\">";
 
             /* Fill in form data for the objectManager URL */
-            $sControls .= $this->makeUrlFormData();
+            $sControls .= $this->makeUrlFormData($aClean["sAction"]);
             $sControls .= "Items per page ";
             $sControls .= "<select name=\"iItemsPerPage\" class=\"form-control form-control-inline input-sm\">";
 
@@ -1713,7 +1722,7 @@ class ObjectManager
         /* Page controls */
         $iPageRange = 7; // the number of page links we want to display
         display_page_range($iPage, $iPageRange, $iNumPages,
-                           $this->makeUrl()."&amp;iItemsPerPage=$iItemsPerPage");
+                           $this->makeUrl($aClean["sAction"], $aClean["iId"])."&amp;iItemsPerPage=$iItemsPerPage");
 
         echo $sControls;
         echo "</div>\n";

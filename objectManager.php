@@ -146,7 +146,7 @@ if(($oObject->getId() || $oObject->IsNullIdAllowed($sAction)) && $sAction != "ad
         break;
 
         case "showMoveChildren":
-        $oObject->display_move_children();
+        $oObject->display_move_children($aClean);
         break;
 
         case "delete":
