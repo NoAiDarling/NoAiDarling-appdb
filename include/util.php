@@ -164,11 +164,10 @@ function get_bugzilla_versions($bReturnIds = false)
 
     $next_update_stamp = -1;
 
-    // Retreieve previous update stamp rom redis to check if time to update
+    // Retrieve previous update stamp from redis to check if it's time to update
     if ($redis->get(REDIS_BUGZ_STAMP) != null)
     {
-        //$next_update_stamp = strtotime('+10 seconds', $redis->get(REDIS_BUGZ_STAMP));
-        $next_update_stamp = strtotime('+24 hours', $redis->get(REDIS_BUGZ_STAMP));
+        $next_update_stamp = strtotime('+1 hours', $redis->get(REDIS_BUGZ_STAMP));
     }
 
     // If time to update versions from Bugzilla then do so and store latest list via redis
