@@ -896,7 +896,7 @@ class ObjectManager
     }
 
     /* Display a page where the user can move the current object to another parent */
-    public function display_change_parent()
+    public function display_change_parent($aClean)
     {
         $oObject = new $this->sClass($this->iId);
         if(!$oObject->canEdit())
@@ -931,7 +931,7 @@ class ObjectManager
             $oGrandFather = null;
         }
 
-        if($oGrandFather && $oParentOM->GetOptionalSetting('objectRestrictMoveObjectListsToParents', false))
+        if(false && $oGrandFather && $oParentOM->GetOptionalSetting('objectRestrictMoveObjectListsToParents', false))
         {
             $aParentSiblings = $oGrandFather->objectGetChildrenClassSpecific(get_class($oParent));
 
@@ -953,13 +953,18 @@ class ObjectManager
             }
         } else
         {
+            $this->handleMultiPageControls($aClean, TRUE, $oParent);
+
             /* We only allow moving to non-queued objects */
-            if(!$hResult = $oParent->objectGetEntries('accepted'))
+            if(!$hResult = $oParent->objectGetEntries('accepted',
+                                                      $this->oMultiPage->iItemsPerPage,
+                                                      $this->oMultiPage->iLowerLimit))
             {
                 echo "Failed to get list of objects.<br>\n";
                 return FALSE;
             }
 
+            $this->showNumberOfResults($oParent);
             for($i = 0; $oRow = query_fetch_object($hResult); $i++)
             {
                 $sParentClass = get_class($oParent);
@@ -1003,7 +1008,7 @@ class ObjectManager
                 "Move here"),
                     "color4");
 
-        if($this->GetOptionalSetting('objectRestrictMoveObjectListsToParents', false))
+        if(false && $this->GetOptionalSetting('objectRestrictMoveObjectListsToParents', false))
         {
             $oParent = $oObject->objectGetParent();
 
@@ -1032,11 +1037,7 @@ class ObjectManager
             /* We only allow moving to non-queued objects */
             if(!$hResult = $oObject->objectGetEntries('accepted',
                                                       $this->oMultiPage->iItemsPerPage,
-                                                      $this->oMultiPage->iLowerLimit,
-                                                      $this->oSortInfo->sCurrentSort,
-                                                      $this->oSortInfo->bAscending,
-                                                      $this->oFilters))
-
+                                                      $this->oMultiPage->iLowerLimit))
             {
                 echo "Failed to get list of objects.<br>\n";
                 return FALSE;
@@ -1227,13 +1228,16 @@ class ObjectManager
                     $oParentOM = new objectManager(get_class($oParent), '', $oParent->objectGetId());
                     $sClassName = $oParentOM->getOptionalSetting('objectGetClassDisplayName', false);
                     if($sClassName)
+                    {
                         $sLinkText = "Move to another $sClassName";
+                    }
                     else
                         $sLinkText = 'Move to another parent entry';
                 }
             }
+
             echo "<a href=\"".$this->makeUrl("showChangeParent", $this->iId,
-                 "Move to another parent entry")."\" class=\"btn btn-default\"><i class=\"fa fa-arrows-alt\"></i> $sLinkText</a>\n";
+                 "Move to another parent entry")."&amp;iItemsPerPage=25&amp;iPage=1&amp;&amp;bAscending=true"."\" class=\"btn btn-default\"><i class=\"fa fa-arrows\"></i> $sLinkText</a>\n";
         }
     }
 
@@ -1649,16 +1653,16 @@ class ObjectManager
         }
     }
 
-    private function handleMultiPageControls($aClean, $bItemsPerPageSelector = TRUE)
+    private function handleMultiPageControls($aClean, $bItemsPerPageSelector = TRUE, $oObject = null)
     {
         /* Display multi-page browsing controls (prev, next etc.) if applicable.
            objectGetItemsPerPage returns FALSE if no multi-page display should be used,
            or an array of options, where the first element contains an array of items
            per page values and the second contains the default value.
            If the function does not exist we assume no multi-page behaviour */
-        $oObject = new $this->sClass();
+        if (!$oObject)
+            $oObject = new $this->sClass();
         $sControls = '';
-
         if(!method_exists($oObject, "objectGetItemsPerPage") ||
           $oObject->objectGetItemsPerPage($this->sState) === FALSE)
         {

@@ -142,7 +142,7 @@ if(($oObject->getId() || $oObject->IsNullIdAllowed($sAction)) && $sAction != "ad
         break;
 
         case 'showChangeParent':
-        $oObject->display_change_parent();
+        $oObject->display_change_parent($aClean);
         break;
 
         case "showMoveChildren":
