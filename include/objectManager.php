@@ -1568,7 +1568,6 @@ class ObjectManager
         $sReturn .= "<input type=\"hidden\" name=\"sTitle\" value=\"".$this->sTitle."\">\n";
         $sReturn .= "<input type=\"hidden\" name=\"sReturnTo\" value=\"".$this->sReturnTo."\">\n";
         $sReturn .= "<input type=\"hidden\" name=\"iId\" value=\"".$this->iId."\">\n";
-        $sReturn .= "<input type=\"hidden\" name=\"sAction\" value=\"".$sAction."\">\n";
 
         if($this->oMultiPage->bEnabled)
         {
