@@ -1032,7 +1032,7 @@ class ObjectManager
             }
         } else
         {
-            $this->handleMultiPageControls($aClean, TRUE);
+            $this->handleMultiPageControls($aClean, TRUE, $oObject);
 
             /* We only allow moving to non-queued objects */
             if(!$hResult = $oObject->objectGetEntries('accepted',

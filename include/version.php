@@ -1455,7 +1455,7 @@ EOT;
         return $sLink;
     }
 
-    public static function objectGetEntriesCount($sState, $oFilters = null)
+    public function objectGetEntriesCount($sState, $oFilters = null)
     {
         $sExtraTables = '';
         $aOptions = $oFilters ? $oFilters->getOptions() : array('onlyWithoutMaintainers' => 'false', 'onlyMyMaintainedEntries' => 'false');
@@ -1475,6 +1475,11 @@ EOT;
            && getInput('onlyMyMaintainedEntries', $aOptions) == 'true')
         {
             return false;
+        }
+
+        if ($this->iAppId)
+        {
+            $sWhereFilter .= " AND appVersion.appId = ?";// . $this->iAppId;
         }
 
         if(getInput('onlyWithoutMaintainers', $aOptions) == 'true')
@@ -1505,13 +1510,19 @@ EOT;
                         AND
                         appVersion.state = '?'$sWhereFilter";
 
-            $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId, $sState);
+            if ($this->iAppId)
+                $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId, $this->iAppId, $sState);
+            else
+                $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId, $sState);
         } else
         {
             $sQuery = "SELECT COUNT(DISTINCT versionId) as count
                     FROM appVersion$sExtraTables WHERE
                     appVersion.state = '?'$sWhereFilter";
-            $hResult = query_parameters($sQuery, $sState);
+            if ($this->iAppId)
+                $hResult = query_parameters($sQuery, $sState, $this->iAppId);
+            else
+                $hResult = query_parameters($sQuery, $sState);
         }
 
         if(!$hResult)
@@ -1619,7 +1630,7 @@ EOT;
         return 'versionId';
     }
 
-    public static function objectGetEntries($sState, $iRows = 0, $iStart = 0, $sOrderBy = "versionId", $bAscending = true, $oFilters = null)
+    public function objectGetEntries($sState, $iRows = 0, $iStart = 0, $sOrderBy = "versionId", $bAscending = true, $oFilters = null)
     {
         $sExtraTables = '';
         $aOptions = $oFilters ? $oFilters->getOptions() : array('onlyWithoutMaintainers' => 'false', 'onlyMyMaintainedEntries' => 'false');
@@ -1632,6 +1643,11 @@ EOT;
            || ($sState != 'accepted' && !$oVersion->canEdit()))
         {
             $bOnlyMyMaintainedEntries = true;
+        }
+
+        if ($this->iAppId)
+        {
+            $sWhereFilter .= " AND appVersion.appId = ?";// . $this->iAppId;
         }
 
         /* This combination doesn't make sense */
@@ -1658,7 +1674,7 @@ EOT;
             /* Selecting 0 rows makes no sense, so we assume the user wants to select all of them
                after an offset given by iStart */
             if(!$iRows)
-                $iRows = version::objectGetEntriesCount($sState);
+                $iRows = $this->objectGetEntriesCount($sState);
         }
 
         if($bOnlyMyMaintainedEntries)
@@ -1683,12 +1699,28 @@ EOT;
 
             if($sLimit)
             {
-                $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId,
-                                            $sState, $sOrderBy, $iStart, $iRows);
+                if ($this->iAppId)
+                {
+                    $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId,
+                                                $sState, $this->iAppId, $sOrderBy, $iStart, $iRows);
+                }
+                else
+                {
+                    $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId,
+                                                $sState, $sOrderBy, $iStart, $iRows);
+                }
             } else
             {
-                $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId,
-                                            $sState, $sOrderBy);
+                if ($this->iAppId)
+                {
+                    $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId,
+                                                $sState, $this->iAppId, $sOrderBy);
+                }
+                else
+                {
+                    $hResult = query_parameters($sQuery, $_SESSION['current']->iUserId,
+                                                $sState, $sOrderBy);
+                }
             }
         } else
         {
@@ -1697,11 +1729,26 @@ EOT;
 
             if($sLimit)
             {
-                $hResult = query_parameters($sQuery, $sState, $sOrderBy,
-                                            $iStart, $iRows);
+                if ($this->iAppId)
+                {
+                    $hResult = query_parameters($sQuery, $sState, $this->iAppId, $sOrderBy,
+                                                $iStart, $iRows);
+                }
+                else
+                {
+                    $hResult = query_parameters($sQuery, $sState, $sOrderBy,
+                                                $iStart, $iRows);
+                }
             } else
             {
-                $hResult = query_parameters($sQuery, $sState, $sOrderBy);
+                if ($this->iAppId)
+                {
+                    $hResult = query_parameters($sQuery, $sState, $this->iAppId, $sOrderBy);
+                }
+                else
+                {
+                    $hResult = query_parameters($sQuery, $sState, $sOrderBy);
+                }
             }
         }
 

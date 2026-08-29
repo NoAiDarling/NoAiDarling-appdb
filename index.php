@@ -144,7 +144,8 @@ else
 ?>
 <?php
 
-    $iNumApps = number_format(version::objectGetEntriesCount('accepted'));
+    $version = new version();
+    $iNumApps = number_format($version->objectGetEntriesCount('accepted'));
 
     $voteQuery = "SELECT appVotes.versionId, count(userId) as count ".
         "FROM appVotes ".

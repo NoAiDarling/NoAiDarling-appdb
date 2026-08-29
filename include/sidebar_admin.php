@@ -12,7 +12,8 @@ function global_admin_menu() {
     $g->add("App Queue (".application::objectGetEntriesCount('queued').")",
             BASE.'objectManager.php?sClass=application_queue&amp;sState=queued&amp;sTitle='.
             'Application%20Queue');
-    $g->add("Version Queue (".version::objectGetEntriesCount('queued').")",
+    $version = new version();
+    $g->add("Version Queue (".$version->objectGetEntriesCount('queued').")",
             BASE.'objectManager.php?sClass=version_queue&amp;sState=queued&amp;sTitle='.
             'Version%20Queue');
     $g->add("Screenshot Queue (".appData::objectGetEntriesCount('queued', "screenshot").")",
@@ -47,7 +48,7 @@ function global_admin_menu() {
     $g->add("Rejected Applications (".application::objectGetEntriesCount('rejected').")",
             BASE.'objectManager.php?sClass=application_queue&amp;sState=rejected&amp;'.
             'sTitle=Rejected%20Applications');
-    $g->add("Rejected Versions (".version::objectGetEntriesCount('rejected').")",
+    $g->add("Rejected Versions (".$version->objectGetEntriesCount('rejected').")",
             BASE.'objectManager.php?sClass=version_queue&amp;sState=rejected&amp;'.
             'sTitle=Rejected%20Versions');
     $g->add("Rejected Test Results (".testData::objectGetEntriesCount('rejected').")",

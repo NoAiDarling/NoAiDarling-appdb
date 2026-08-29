@@ -66,7 +66,8 @@ echo "</tr>\n\n";
 /* Display the number of versions */
 echo "<tr>\n";
 echo "    <td>Versions:</td>\n";
-echo "    <td>".version::objectGetEntriesCount('accepted')."</td>\n";
+$version = new verison();
+echo "    <td>".$version->objectGetEntriesCount('accepted')."</td>\n";
 echo "</tr>\n\n";
 
 /* Display the number of application maintainers */

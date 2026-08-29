@@ -26,7 +26,8 @@ function updateAppMaintainerStates()
 
 function updateVersionMaintainerStates()
 {
-    $hResult = version::objectGetEntries('accepted');
+    $version = new version();
+    $hResult = $version->objectGetEntries('accepted');
 
     $i = 0;
     while($oRow = query_fetch_object($hResult))
@@ -279,8 +280,9 @@ function deleteOldErrorLogs()
 }
 
 function updateVersionRatings()
-{ 
-    $hResult = version::objectGetEntries('accepted');
+{
+    $version = new version();
+    $hResult = $version->objectGetEntries('accepted');
 
     $i = 0;
     while($oRow = query_fetch_object($hResult))

@@ -53,7 +53,8 @@ function global_sidebar_login() {
         }
 
         /* Display the user's rejected versions */
-        $iVersionsRejected = version::objectGetEntriesCount('rejected');
+        $version = new version();
+        $iVersionsRejected = $version->objectGetEntriesCount('rejected');
         if($iVersionsRejected && !$_SESSION['current']->hasPriv("admin"))
         {
             $g->add("Review Rejected Versions ($iVersionsRejected)",
