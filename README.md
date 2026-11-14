@@ -1,5 +1,5 @@
 # NoAiDarling Application Database
-This is a soft fork of the WineHQ appdb for NoAiDarling appdb specific changes
+This is a soft fork of the WineHQ appdb with NoAiDarling appdb specific changes
 
 # WineHQ Application Database
 https://gitlab.winehq.org/winehq/appdb
